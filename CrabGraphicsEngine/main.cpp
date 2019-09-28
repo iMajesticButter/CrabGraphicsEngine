@@ -2,36 +2,15 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include "CrabWindow.h"
 
-void glfwErrorCallback(int err, const char* description) {
+/*void glfwErrorCallback(int err, const char* description) {
     std::cerr << "ERROR: " << description << std::endl;
-}
+}*/
 
+GLuint vertexBuf;
 
-int main() {
-
-    if(!glfwInit()) {
-        std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
-    }
-
-
-    glfwSetErrorCallback(glfwErrorCallback);
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_SAMPLES, 4);
-
-    GLFWwindow* window = glfwCreateWindow(300, 300, "TEST", nullptr, nullptr);
-
-    if(!window) {
-        std::cerr << "WINDOW CONTEXT CREATION FAILED!" << std::endl;
-    }
-
-    glfwMakeContextCurrent(window);
-    glewInit();
-
-    //triangle test
-
+GLuint InitOpenGL() {
     static const char* vertex_shader_text =
     "#version 330\n"
     "layout(location = 0) in vec3 inPos;\n"
@@ -65,7 +44,6 @@ int main() {
 	int InfoLogLength;
 
     //create vertex buffer
-    GLuint vertexBuf;
     glGenBuffers(1, &vertexBuf);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuf);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gVertBufData), gVertBufData, GL_STATIC_DRAW);
@@ -116,13 +94,45 @@ int main() {
     glDeleteShader(VertShader);
     glDeleteShader(FragShader);
 
-    while(!glfwWindowShouldClose(window)) {
+    return program;
+}
 
-        int width, height;
+int main() {
 
-        glfwGetFramebufferSize(window, &width, &height);
+    CrabEngine::Graphics::Window window(300, 300, "TEST", false, false, true, true);
 
-        glViewport(0, 0, width, height);
+    /*if(!glfwInit()) {
+        std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
+    }
+
+
+    glfwSetErrorCallback(glfwErrorCallback);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
+    GLFWwindow* window = glfwCreateWindow(300, 300, "TEST", nullptr, nullptr);
+
+    if(!window) {
+        std::cerr << "WINDOW CONTEXT CREATION FAILED!" << std::endl;
+    }
+
+    glfwMakeContextCurrent(window);
+    glewInit();*/
+
+    //triangle test
+
+    GLuint program = InitOpenGL();
+
+    bool fullscreen = false;
+    bool borderless = false;
+
+    while(!window.shouldClose()) {
+
+        window.update();
+
+        glViewport(0, 0, window.fbWidth(), window.fbHeight());
         glClear(GL_COLOR_BUFFER_BIT);
 
         //draw triangle test
@@ -134,26 +144,34 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glDisableVertexAttribArray(0);
 
-        double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-
         //printf("mouseY: %f\n", -(mouseY-height/2));
 
         GLint fragMousePos = glGetUniformLocation(program, "mousePos");
         if(fragMousePos != -1) {
-
-            glUniform2f(fragMousePos, mouseX, -(mouseY-height));
+            glUniform2f(fragMousePos, window.cursorX(), -(window.cursorY()-window.fbHeight()));
         }
 
-        glfwSwapBuffers(window);
+        if(window.keyDown(GLFW_KEY_ESCAPE)) {
+            break;
+        } else {
+            if(window.keyDown(GLFW_KEY_F)) {
+                fullscreen = !fullscreen;
+                window.setFullscreen(fullscreen);
+                window.initialize();
 
-        glfwPollEvents();
+                program = InitOpenGL();
+            }
+
+            if(window.keyDown(GLFW_KEY_B)) {
+                borderless = !borderless;
+                window.setBorderless(borderless);
+                window.initialize();
+
+                program = InitOpenGL();
+            }
+        }
 
     }
-
-    glfwDestroyWindow(window);
-
-    glfwTerminate();
 
     return 0;
 }
