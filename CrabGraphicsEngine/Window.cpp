@@ -44,6 +44,18 @@ namespace CrabEngine {
             glfwTerminate();
         }
 
+        void Window::registerInitFunc(const windowInitEventCallback& Callback) {
+            m_initFuncs.push_back(Callback);
+        }
+
+        void Window::removeInitFunc(void* context) {
+            for(unsigned i = 0; i < m_initFuncs.size(); ++i) {
+                if(m_initFuncs[i].context == context) {
+                    m_initFuncs.erase(m_initFuncs.begin() + i);
+                }
+            }
+        }
+
         void Window::update() {
             glfwSwapBuffers(m_window);
 
@@ -170,6 +182,11 @@ namespace CrabEngine {
             glfwMakeContextCurrent(m_window);
             glewInit();
 
+            //run intitialize callbacks
+            for(unsigned i = 0; i < m_initFuncs.size(); ++i) {
+                m_initFuncs[i].func(m_initFuncs[i].context);
+            }
+
             if(m_vSync) {
                 //enable vSync
                 glfwSwapInterval(1);
@@ -182,8 +199,6 @@ namespace CrabEngine {
             glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GLFW_TRUE);
 
             update();
-
         }
-
     }
 }

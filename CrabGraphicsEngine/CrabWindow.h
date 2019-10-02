@@ -3,16 +3,25 @@
 #define CrabEngine_Graphics_Window_HEADER
 
 #include <string>
+#include <vector>
 
 typedef struct GLFWwindow GLFWwindow;
 
 namespace CrabEngine {
     namespace Graphics {
 
+        struct windowInitEventCallback {
+            void(*func)(void* context);
+            void* context;
+        };
+
         class Window {
         public:
             Window(unsigned width, unsigned height, std::string name, bool fullscreen, bool borderless, bool vSync, unsigned MSAA);
             ~Window();
+
+            void registerInitFunc(const windowInitEventCallback& callback);
+            void removeInitFunc(void* context);
 
             void update();
 
@@ -47,6 +56,9 @@ namespace CrabEngine {
             std::string m_name;
 
             GLFWwindow* m_window;
+
+            //array of intiailize functions
+            std::vector<windowInitEventCallback> m_initFuncs;
 
         };
     }

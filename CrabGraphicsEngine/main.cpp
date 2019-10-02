@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "CrabWindow.h"
+#include "CrabShader.h"
 
 /*void glfwErrorCallback(int err, const char* description) {
     std::cerr << "ERROR: " << description << std::endl;
@@ -10,8 +11,8 @@
 
 GLuint vertexBuf;
 
-GLuint InitOpenGL() {
-    static const char* vertex_shader_text =
+GLuint InitOpenGL(CrabEngine::Graphics::Shader vertShader, CrabEngine::Graphics::Shader fragShader) {
+    /*static const char* vertex_shader_text =
     "#version 330\n"
     "layout(location = 0) in vec3 inPos;\n"
     "void main()\n"
@@ -27,7 +28,7 @@ GLuint InitOpenGL() {
     "{\n"
     "    float dist = distance(mousePos, gl_FragCoord.xy)*0.1;"
     "    color = vec3(gl_FragCoord.x/100, gl_FragCoord.y/100, 0) / dist;\n"
-    "}\n";
+    "}\n";*/
 
     //triangle
     const GLfloat gVertBufData[] = {
@@ -48,7 +49,7 @@ GLuint InitOpenGL() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuf);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gVertBufData), gVertBufData, GL_STATIC_DRAW);
 
-    GLuint VertShader = glCreateShader(GL_VERTEX_SHADER);
+    /*GLuint VertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(VertShader, 1, &vertex_shader_text, nullptr);
     glCompileShader(VertShader);
 
@@ -72,11 +73,11 @@ GLuint InitOpenGL() {
 		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
 		glGetShaderInfoLog(FragShader, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
 		printf("%s\n", &VertexShaderErrorMessage[0]);
-	}
+	}*/
 
     GLuint program = glCreateProgram();
-    glAttachShader(program, VertShader);
-    glAttachShader(program, FragShader);
+    glAttachShader(program, vertShader.getShaderID());
+    glAttachShader(program, fragShader.getShaderID());
     glLinkProgram(program);
 
     // Check the program
@@ -88,11 +89,8 @@ GLuint InitOpenGL() {
 		printf("%s\n", &ProgramErrorMessage[0]);
 	}
 
-    glDetachShader(program, VertShader);
-    glDetachShader(program, FragShader);
-
-    glDeleteShader(VertShader);
-    glDeleteShader(FragShader);
+    glDetachShader(program, vertShader.getShaderID());
+    glDetachShader(program, fragShader.getShaderID());
 
     return program;
 }
@@ -100,6 +98,9 @@ GLuint InitOpenGL() {
 int main() {
 
     CrabEngine::Graphics::Window window(300, 300, "TEST", false, false, true, true);
+
+    CrabEngine::Graphics::VertexShader vertShader(window, "./shaders/vertShaderTest.vs");
+    CrabEngine::Graphics::FragmentShader fragShader(window, "./shaders/fragShaderTest.fs");
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -123,7 +124,7 @@ int main() {
 
     //triangle test
 
-    GLuint program = InitOpenGL();
+    GLuint program = InitOpenGL(vertShader, fragShader);
 
     bool fullscreen = false;
     bool borderless = false;
@@ -159,7 +160,7 @@ int main() {
                 window.setFullscreen(fullscreen);
                 window.initialize();
 
-                program = InitOpenGL();
+                program = InitOpenGL(vertShader, fragShader);
             }
 
             if(window.keyDown(GLFW_KEY_B)) {
@@ -167,10 +168,9 @@ int main() {
                 window.setBorderless(borderless);
                 window.initialize();
 
-                program = InitOpenGL();
+                program = InitOpenGL(vertShader, fragShader);
             }
         }
-
     }
 
     return 0;
