@@ -129,7 +129,9 @@ namespace CrabEngine {
             }
 
             //get monitor
-            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            int count;
+            GLFWmonitor* monitor = glfwGetMonitors(&count)[0];
 
             if(m_MSAA) {
                 //enable 4xMSAA
