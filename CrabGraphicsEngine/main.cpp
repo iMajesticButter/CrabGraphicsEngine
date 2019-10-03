@@ -97,7 +97,7 @@ GLuint InitOpenGL(CrabEngine::Graphics::Shader vertShader, CrabEngine::Graphics:
 
 int main() {
 
-    CrabEngine::Graphics::Window window(1280, 720, "TEST", true, true, false, true);
+    CrabEngine::Graphics::Window window(1920, 1080, "TEST", false, false, false, true);
 
     CrabEngine::Graphics::VertexShader vertShader(window, "./shaders/vertShaderTest.vs");
     CrabEngine::Graphics::FragmentShader fragShader(window, "./shaders/fragShaderTest.fs");
