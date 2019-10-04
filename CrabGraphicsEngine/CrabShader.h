@@ -13,31 +13,27 @@ namespace CrabEngine {
 
         class Shader {
         public:
-            Shader(Window& window, const std::string& path, GLuint shaderType);
-            ~Shader();
+            Shader(const std::string& path, GLuint shaderType);
+            Shader(const Shader& shader);
 
-            GLuint getShaderID() const;
+            std::string getSource();
 
-            void Initialize();
+            GLuint getType();
+
         private:
-
-            GLuint m_shaderIndex;
             GLuint m_shaderType;
 
-            void* m_window;
-
             std::string m_shaderSource;
-
         };
 
         class VertexShader : public Shader {
         public:
-            VertexShader(Window& window, const std::string& path);
+            VertexShader(const std::string& path);
         };
 
         class FragmentShader : public Shader {
         public:
-            FragmentShader(Window& window, const std::string& path);
+            FragmentShader(const std::string& path);
         };
 
     }

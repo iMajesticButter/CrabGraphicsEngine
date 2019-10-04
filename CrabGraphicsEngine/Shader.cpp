@@ -10,23 +10,11 @@ namespace CrabEngine {
         // shader
         //---------------
 
-        //window reset event callback
-        void windowResetCallback(void* context) {
-            ((Shader*)context)->Initialize();
-        }
-
         //public functions
 
-        Shader::Shader(Window& window, const std::string& path, GLuint shaderType) {
-            //register with window reset callback
-            windowInitEventCallback callback;
-            callback.func = windowResetCallback;
-            callback.context = (void*)this;
-            window.registerInitFunc(callback);
-
+        Shader::Shader(const std::string& path, GLuint shaderType) {
             //set variables
             m_shaderType = shaderType;
-            m_window = &window;
 
             //get shader source from file
             std::fstream file;
@@ -34,43 +22,19 @@ namespace CrabEngine {
             std::stringstream sstr;
             sstr << file.rdbuf();
             m_shaderSource = sstr.str();
-
-            //compile shader
-            Initialize();
         }
 
-        Shader::~Shader() {
-            ((Window*)m_window)->removeInitFunc(this);
-
-            glDeleteShader(m_shaderIndex);
+        Shader::Shader(const Shader& shader) {
+            m_shaderType = shader.m_shaderType;
+            m_shaderSource = shader.m_shaderSource;
         }
 
-        GLuint Shader::getShaderID() const {
-            return m_shaderIndex;
+        std::string Shader::getSource() {
+            return m_shaderSource;
         }
 
-        //private functions
-
-        void Shader::Initialize() {
-            //printf("Shader callback\n");
-            const char* src = m_shaderSource.c_str();
-
-            //create and compile shader
-            m_shaderIndex = glCreateShader(m_shaderType);
-            glShaderSource(m_shaderIndex, 1, &src, nullptr);
-            glCompileShader(m_shaderIndex);
-
-            //check shader for errors
-            GLint Result = GL_FALSE;
-            int InfoLogLength;
-
-            glGetShaderiv(m_shaderIndex, GL_COMPILE_STATUS, &Result);
-        	glGetShaderiv(m_shaderIndex, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        	if ( InfoLogLength > 0 ) {
-        		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
-        		glGetShaderInfoLog(m_shaderIndex, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-        		printf("%s\n", &VertexShaderErrorMessage[0]);
-        	}
+        GLuint Shader::getType() {
+            return m_shaderType;
         }
 
         //------------------
@@ -79,8 +43,8 @@ namespace CrabEngine {
 
         //public functions
 
-        VertexShader::VertexShader(Window& window, const std::string& path) :
-            Shader(window, path, GL_VERTEX_SHADER) {}
+        VertexShader::VertexShader(const std::string& path) :
+            Shader(path, GL_VERTEX_SHADER) {}
 
         //------------------
         // fragment shader
@@ -88,8 +52,8 @@ namespace CrabEngine {
 
         //public functions
 
-        FragmentShader::FragmentShader(Window& window, const std::string& path) :
-            Shader(window, path, GL_FRAGMENT_SHADER) {}
+        FragmentShader::FragmentShader(const std::string& path) :
+            Shader(path, GL_FRAGMENT_SHADER) {}
 
     }
 }
