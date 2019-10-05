@@ -16,7 +16,7 @@ namespace CrabEngine {
             Shader(const std::string& path, GLuint shaderType);
             Shader(const Shader& shader);
 
-            std::string getSource();
+            std::string& getSource();
 
             GLuint getType();
 

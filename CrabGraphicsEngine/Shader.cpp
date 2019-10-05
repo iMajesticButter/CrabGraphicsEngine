@@ -29,7 +29,7 @@ namespace CrabEngine {
             m_shaderSource = shader.m_shaderSource;
         }
 
-        std::string Shader::getSource() {
+        std::string& Shader::getSource() {
             return m_shaderSource;
         }
 

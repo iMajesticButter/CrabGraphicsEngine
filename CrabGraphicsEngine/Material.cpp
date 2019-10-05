@@ -4,22 +4,57 @@
 namespace CrabEngine {
     namespace Graphics {
 
+        //Window reset event
+        void windowReset(void* context) {
+            if(((Material*)context)->isInitialized()) {
+                ((Material*)context)->Initialize();
+            }
+        }
+
+        //-------------------------
+        // Public Funcs
+        //-------------------------
+
         Material::Material(Window& window, const std::string name) : m_initialized(false) {
             m_name = name;
             m_window = &window;
+
+            //register initialize function on window reset event
+            windowInitEventCallback windowResetCallback;
+            windowResetCallback.func = windowReset;
+            windowResetCallback.context = this;
+            m_window->registerInitFunc(windowResetCallback);
+
         }
 
         Material::~Material() {
             if(m_initialized) {
                 glDeleteProgram(m_program);
             }
+            m_window->removeInitFunc(this);
         }
 
         void Material::AddShader(const Shader& shader) {
             m_shaders.push_back(shader);
         }
+        GLuint Material::getProgram() {
+            if(m_initialized) {
+                return m_program;
+            }
+            return 0;
+        }
+        void Material::use() {
+            if(m_initialized) {
+                glUseProgram(m_program);
+            }
+        }
+        std::string Material::getName() {
+            return m_name;
+        }
 
         void Material::Initialize() {
+            m_initialized = true;
+
             //error vars
             GLint Result = GL_FALSE;
             int InfoLogLength;
@@ -39,9 +74,10 @@ namespace CrabEngine {
             	glGetShaderiv(shaders[i], GL_COMPILE_STATUS, &Result);
             	glGetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &InfoLogLength);
             	if ( InfoLogLength > 0 ){
-            		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
-            		glGetShaderInfoLog(shaders[i], InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-            		printf("%s\n", &VertexShaderErrorMessage[0]);
+            		std::vector<char> ShaderErrorMessage(InfoLogLength+1);
+            		glGetShaderInfoLog(shaders[i], InfoLogLength, NULL, &ShaderErrorMessage[0]);
+            		printf("%s\n", &ShaderErrorMessage[0]);
+                    printf("Source: %s\n", src);
             	}
             }
 
@@ -75,6 +111,10 @@ namespace CrabEngine {
                 glDetachShader(m_program, shaders[i]);
                 glDeleteShader(shaders[i]);
             }
+        }
+
+        bool Material::isInitialized() {
+            return m_initialized;
         }
 
 

@@ -19,8 +19,13 @@ namespace CrabEngine {
             ~Material();
 
             void AddShader(const Shader& shader);
+            GLuint getProgram();
+            void use();
+            std::string getName();
 
             void Initialize();
+
+            bool isInitialized();
 
             //set uniforms
             void setUniform1i  (const std::string name, const int val);
