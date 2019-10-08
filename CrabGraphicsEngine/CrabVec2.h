@@ -18,25 +18,25 @@ namespace CrabEngine {
             Vec2(const Vec4& other);
 
             //Public Funcs
-            float normalized();
-            float magnitude();
-            float magnitudeSquared();
-            float distance(Vec2 other);
-            float distanceSquared(Vec2 other);
-            float dot(Vec2 other);
-            Vec3 cross(Vec3 other);
-            Vec2 midpoint(Vec2 other);
+            Vec2 normalized() const;
+            float magnitude() const;
+            float magnitudeSquared() const;
+            float distance(Vec2 other) const;
+            float distanceSquared(Vec2 other) const;
+            float dot(Vec2 other) const;
+            Vec3 cross(Vec3 other) const;
+            Vec2 midpoint(Vec2 other) const;
 
             //Operators
-            Vec2 operator+(const Vec2& other);
-            Vec2 operator-(const Vec2& other);
-            Vec2 operator*(const Vec2& other);
-            Vec2 operator/(const Vec2& other);
+            Vec2 operator+(const Vec2& other) const;
+            Vec2 operator-(const Vec2& other) const;
+            Vec2 operator*(const Vec2& other) const;
+            Vec2 operator/(const Vec2& other) const;
 
-            Vec2 operator+(const float& val);
-            Vec2 operator-(const float& val);
-            Vec2 operator*(const float& val);
-            Vec2 operator/(const float& val);
+            Vec2 operator+(const float& val) const;
+            Vec2 operator-(const float& val) const;
+            Vec2 operator*(const float& val) const;
+            Vec2 operator/(const float& val) const;
 
             Vec2& operator+=(const Vec2& other);
             Vec2& operator-=(const Vec2& other);
@@ -51,17 +51,17 @@ namespace CrabEngine {
             Vec2& operator=(const Vec2& other);
             Vec2& operator=(const float& val);
 
-            Vec2 operator-();
+            Vec2 operator-() const;
 
             Vec2& operator++();
             Vec2& operator--();
 
-            bool operator<(const Vec2& other);
-            bool operator>(const Vec2& other);
-            bool operator<=(const Vec2& other);
-            bool operator>=(const Vec2& other);
-            bool operator==(const Vec2& other);
-            bool operator!=(const Vec2& other);
+            bool operator<(const Vec2& other) const;
+            bool operator>(const Vec2& other) const;
+            bool operator<=(const Vec2& other) const;
+            bool operator>=(const Vec2& other) const;
+            bool operator==(const Vec2& other) const;
+            bool operator!=(const Vec2& other) const;
 
 
         };

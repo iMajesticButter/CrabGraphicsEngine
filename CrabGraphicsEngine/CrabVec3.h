@@ -9,13 +9,6 @@ namespace CrabEngine {
         class Vec3 {
         public:
             float x,y,z;
-            float& r = x;
-            float& g = y;
-            float& b = z;
-
-            float& red   = x;
-            float& green = y;
-            float& blue  = z;
 
             //constructors
             Vec3(float x, float y, float z);
@@ -26,28 +19,25 @@ namespace CrabEngine {
             Vec3(const Vec4& other);
 
             //Public Funcs
-            float normalized();
-            float magnitude();
-            float magnitudeSquared();
-            float distance(Vec3 other);
-            float distanceSquared(Vec3 other);
-            float dot(Vec3 other);
-            Vec3 cross(Vec3 other);
-            Vec3 midpoint(Vec3 other);
-            Vec3 getHSV();
-            void setHSV(Vec3 hsv);
-            Vec4 getColor();
+            Vec3 normalized() const;
+            float magnitude() const;
+            float magnitudeSquared() const;
+            float distance(Vec3 other) const;
+            float distanceSquared(Vec3 other) const;
+            float dot(Vec3 other) const;
+            Vec3 cross(Vec3 other) const;
+            Vec3 midpoint(Vec3 other) const;
 
             //Operators
-            Vec3 operator+(const Vec3& other);
-            Vec3 operator-(const Vec3& other);
-            Vec3 operator*(const Vec3& other);
-            Vec3 operator/(const Vec3& other);
+            Vec3 operator+(const Vec3& other) const;
+            Vec3 operator-(const Vec3& other) const;
+            Vec3 operator*(const Vec3& other) const;
+            Vec3 operator/(const Vec3& other) const;
 
-            Vec3 operator+(const float& val);
-            Vec3 operator-(const float& val);
-            Vec3 operator*(const float& val);
-            Vec3 operator/(const float& val);
+            Vec3 operator+(const float& val) const;
+            Vec3 operator-(const float& val) const;
+            Vec3 operator*(const float& val) const;
+            Vec3 operator/(const float& val) const;
 
             Vec3& operator+=(const Vec3& other);
             Vec3& operator-=(const Vec3& other);
@@ -62,17 +52,28 @@ namespace CrabEngine {
             Vec3& operator=(const Vec3& other);
             Vec3& operator=(const float& val);
 
-            Vec3 operator-();
+            Vec3 operator-() const;
 
             Vec3& operator++();
             Vec3& operator--();
 
-            bool operator<(const Vec3& other);
-            bool operator>(const Vec3& other);
-            bool operator<=(const Vec3& other);
-            bool operator>=(const Vec3& other);
-            bool operator==(const Vec3& other);
-            bool operator!=(const Vec3& other);
+            bool operator<(const Vec3& other) const;
+            bool operator>(const Vec3& other) const;
+            bool operator<=(const Vec3& other) const;
+            bool operator>=(const Vec3& other) const;
+            bool operator==(const Vec3& other) const;
+            bool operator!=(const Vec3& other) const;
+        };
+
+        class hsv : public Vec3 {
+        public:
+            float& h = x;
+            float& s = x;
+            float& v = x;
+
+            float& hue = x;
+            float& saturation = x;
+            float& value = x;
         };
 
 
