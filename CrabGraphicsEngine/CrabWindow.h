@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "CrabVec2.h"
 
 typedef struct GLFWwindow GLFWwindow;
 
@@ -17,7 +18,8 @@ namespace CrabEngine {
 
         class Window {
         public:
-            Window(unsigned width, unsigned height, std::string name, bool fullscreen, bool borderless, bool vSync, unsigned MSAA);
+            Window(int width, int height, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA);
+            Window(CrabEngine::Math::Vec2 resolution, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA);
             ~Window();
 
             void registerInitFunc(const windowInitEventCallback& callback);
@@ -37,20 +39,25 @@ namespace CrabEngine {
 
             bool keyDown(int key);
 
-            void setWidth(const unsigned &width);
-            void setHeight(const unsigned &height);
-            void setFullscreen(const bool &fullscreen);
-            void setBorderless(const bool &borderless);
-            void setVSync(const bool &vSync);
-            void setMSAA(const unsigned &MSAAlevel);
+            CrabEngine::Math::Vec2 getMonitorResolution() const;
+
+            void setWidth(const unsigned& width);
+            void setHeight(const unsigned& height);
+            void setFullscreen(const bool& fullscreen);
+            void setBorderless(const bool& borderless);
+            void setVSync(const bool& vSync);
+            void setMSAA(const unsigned& MSAAlevel);
             void setName(const std::string name);
+            void setResizeable(const bool& resizeable);
 
             void initialize();
 
         private:
+            void construct(int width, int height, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA);
+
             int m_fbWidth, m_fbHeight;
             unsigned m_width, m_height, m_MSAA;
-            bool m_fullscreen, m_borderless, m_vSync;
+            bool m_fullscreen, m_borderless, m_vSync, m_resizeable;
             double m_cursorX, m_cursorY;
 
             std::string m_name;

@@ -1,7 +1,8 @@
-#include "CrabWindow.h"
 #include <GLEW/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+
+#include "CrabWindow.h"
 
 void glfwErrorCallback(int err, const char* description) {
     std::cerr << "ERROR: " << err << " (" << description << ")" << std::endl;
@@ -14,29 +15,16 @@ namespace CrabEngine {
         // Public Functions
         //-------------------
 
-        Window::Window(unsigned width, unsigned height, std::string name, bool fullscreen, bool borderless, bool vSync, unsigned MSAA) :
+        Window::Window(int width, int height, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA) :
         m_window(nullptr) {
-            //set window settings
-
-            setWidth(width);
-            setHeight(height);
-            setFullscreen(fullscreen);
-            setBorderless(borderless);
-            setVSync(vSync);
-            setMSAA(MSAA);
-            setName(name);
-
-            //initialize glfw
-            if(!glfwInit()) {
-                std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
-                throw std::runtime_error("FAILED TO INITIALIZE GLFW!");
-                return;
-            }
-            //set error callback
-            glfwSetErrorCallback(glfwErrorCallback);
-            //create window
-            initialize();
+            construct(width, height, name, fullscreen, borderless, resizeable, vSync, MSAA);
         }
+
+        Window::Window(CrabEngine::Math::Vec2 resolution, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA) :
+        m_window(nullptr) {
+            construct(resolution.x, resolution.y, name, fullscreen, borderless, resizeable, vSync, MSAA);
+        }
+
         Window::~Window() {
             if(m_window != nullptr) {
                 glfwDestroyWindow(m_window);
@@ -90,6 +78,17 @@ namespace CrabEngine {
             return glfwGetKey(m_window, key);
         }
 
+        CrabEngine::Math::Vec2 Window::getMonitorResolution() const {
+            CrabEngine::Math::Vec2 res;
+
+            const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            res.x = mode->width;
+            res.y = mode->height;
+
+            return res;
+        }
+
         void Window::setWidth(const unsigned &width) {
             m_width = width;
         }
@@ -119,6 +118,9 @@ namespace CrabEngine {
         }
         void Window::setName(const std::string name) {
             m_name = name;
+        }
+        void Window::setResizeable(const bool& resizeable) {
+            m_resizeable = resizeable;
         }
 
         void Window::initialize() {
@@ -161,11 +163,9 @@ namespace CrabEngine {
                 glfwWindowHint(GLFW_AUTO_ICONIFY, true);
             }
 
-            if(m_borderless) {
-                glfwWindowHint(GLFW_DECORATED, false);
-            } else {
-                glfwWindowHint(GLFW_DECORATED, true);
-            }
+            glfwWindowHint(GLFW_DECORATED, !m_borderless);
+
+            glfwWindowHint(GLFW_RESIZABLE, m_resizeable);
 
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -201,6 +201,38 @@ namespace CrabEngine {
             glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GLFW_TRUE);
 
             update();
+        }
+
+        void Window::construct(int width, int height, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA) {
+            //initialize glfw
+            if(!glfwInit()) {
+                std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
+                throw std::runtime_error("FAILED TO INITIALIZE GLFW!");
+                return;
+            }
+
+            if(width < 1 || height < 1) {
+                const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+                width = width < 1 ? mode->width : width;
+                height = height < 1 ? mode->height : height;
+
+            }
+
+            //set window settings
+            setWidth((unsigned)width);
+            setHeight((unsigned)height);
+            setFullscreen(fullscreen);
+            setBorderless(borderless);
+            setVSync(vSync);
+            setMSAA(MSAA);
+            setName(name);
+            setResizeable(resizeable);
+
+            //set error callback
+            glfwSetErrorCallback(glfwErrorCallback);
+            //create window
+            initialize();
         }
     }
 }
