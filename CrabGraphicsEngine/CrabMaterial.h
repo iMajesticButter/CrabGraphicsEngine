@@ -24,7 +24,8 @@ namespace CrabEngine {
 
             void AddShader(const Shader& shader);
             GLuint getProgram();
-            void use();
+            void bind();
+            void unbind();
             std::string getName();
 
             void Initialize();
@@ -67,6 +68,7 @@ namespace CrabEngine {
 
             GLuint m_program;
             bool m_initialized;
+            bool m_bound;
 
         };
 

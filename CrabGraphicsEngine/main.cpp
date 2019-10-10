@@ -41,15 +41,21 @@ void InitOpenGL() {
 
     //triangle
     const GLfloat gVertBufData[] = {
-        0.0f,   1.0f,
+        1.0f,   1.0f,
         1.0f,  -1.0f,
-       -1.0f,  -1.0f
+       -1.0f,  -1.0f,
+        1.0f,   1.0f,
+       -1.0f,  -1.0f,
+       -1.0f,   1.0f
     };
 
     const GLfloat gColBufData[] = {
         1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
+        0.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f
     };
 
     //GLuint VAO;
@@ -188,7 +194,7 @@ int main() {
 
         //glUseProgram(program);
         testMat.use();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         //glDisableVertexAttribArray(0);
 
         glBindVertexArray(0);
