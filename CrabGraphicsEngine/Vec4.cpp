@@ -259,6 +259,9 @@ namespace CrabEngine {
         std::ostream& operator<<(std::ostream& os, const Vec4& vec) {
             return os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")";
         }
+        Vec2 operator*(float val, const Vec4& vec) {
+            return vec * val;
+        }
 
         //Color
 

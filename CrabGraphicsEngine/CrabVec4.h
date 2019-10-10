@@ -1,3 +1,6 @@
+#ifndef CrabEngine_Math_Vec4_HEADER
+#define CrabEngine_Math_Vec4_HEADER
+
 #include <ostream>
 
 namespace CrabEngine {
@@ -94,6 +97,9 @@ namespace CrabEngine {
 
         //non-member operators
         std::ostream& operator<<(std::ostream& os, const Vec4& vec);
+        Vec2 operator*(float val, const Vec4& vec);
 
     }
 }
+
+#endif

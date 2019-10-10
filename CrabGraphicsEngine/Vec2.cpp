@@ -181,5 +181,8 @@ namespace CrabEngine {
         std::ostream& operator<<(std::ostream& os, const Vec2& vec) {
             return os << "(" << vec.x << ", " << vec.y << ")";
         }
+        Vec2 operator*(float val, const Vec2& vec) {
+            return vec * val;
+        }
     }
 }

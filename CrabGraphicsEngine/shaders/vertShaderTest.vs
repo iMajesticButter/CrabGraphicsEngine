@@ -1,10 +1,12 @@
 #version 330
 
-in vec3 inPos;
+in vec4 inPos;
+uniform mat4 MVP;
 
 void main() {
 
-    gl_Position.xyz = inPos;
-    gl_Position.w = 1.0;
+    vec4 outPos = MVP * inPos;
+
+    gl_Position = outPos;
 
 }

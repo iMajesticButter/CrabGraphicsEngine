@@ -223,5 +223,32 @@ namespace CrabEngine {
                 glUniform4d(uniformPointer, val1, val2, val3, val4);
             }
         }
+
+        void Material::setUniform2f  (const std::string name, const CrabEngine::Math::Vec2& vec) {
+            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            if(uniformPointer != -1) {
+                glUniform2f(uniformPointer, vec.x, vec.y);
+            }
+        }
+        void Material::setUniform3f  (const std::string name, const CrabEngine::Math::Vec3& vec) {
+            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            if(uniformPointer != -1) {
+                glUniform3f(uniformPointer, vec.x, vec.y, vec.z);
+            }
+        }
+        void Material::setUniform4f  (const std::string name, const CrabEngine::Math::Vec4& vec) {
+            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            if(uniformPointer != -1) {
+                glUniform4f(uniformPointer, vec.x, vec.y, vec.z, vec.w);
+            }
+        }
+
+        void Material::setUniformMat4(const std::string name, CrabEngine::Math::Mat4& mat) {
+            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            if(uniformPointer != -1) {
+                glUniformMatrix4fv(uniformPointer, 1, GL_TRUE, mat.begin());
+            }
+        }
+
     }
 }

@@ -5,6 +5,13 @@
 #include "CrabWindow.h"
 #include "CrabShader.h"
 #include "CrabMaterial.h"
+#include "CrabVec2.h"
+#include "CrabVec3.h"
+#include "CrabVec4.h"
+#include "CrabMat4.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 /*void glfwErrorCallback(int err, const char* description) {
     std::cerr << "ERROR: " << description << std::endl;
@@ -98,15 +105,24 @@ void InitOpenGL() {
 
 int main() {
 
-    CrabEngine::Graphics::Window window(CrabEngine::Math::Vec2(-1), "TEST", false, false, true, false, true);
+    using namespace CrabEngine::Math;
+    using namespace CrabEngine::Graphics;
 
-    CrabEngine::Graphics::VertexShader vertShader("./shaders/vertShaderTest.vs");
-    CrabEngine::Graphics::FragmentShader fragShader("./shaders/fragShaderTest.fs");
+    Window window(Vec2(-1), "TEST", false, false, true, false, true);
 
-    CrabEngine::Graphics::Material testMat(window, "test");
+    VertexShader vertShader("./shaders/vertShaderTest.vs");
+    FragmentShader fragShader("./shaders/fragShaderTest.fs");
+
+    Material testMat(window, "test");
     testMat.AddShader(vertShader);
     testMat.AddShader(fragShader);
     testMat.Initialize();
+
+    Vec3 pos(0, 0, 10);
+    Vec2 scale(1, 0.5);
+    float rot = 0 * (M_PI/180);
+
+
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -142,6 +158,9 @@ int main() {
         glViewport(0, 0, window.fbWidth(), window.fbHeight());
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //create projection matrix
+        PerspectiveProjectionMatrix projMat(30.0f, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
+
         //draw triangle test
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuf);
@@ -159,7 +178,61 @@ int main() {
         //    glUniform2f(fragMousePos, window.cursorX(), -(window.cursorY()-window.fbHeight()));
         //}
 
+        //create transformation matrix
+        ScaleMatrix scaleMat(scale);
+        RotationMatrix2D rotMat(rot);
+        TranslationMatrix transMat(pos);
+        Mat4 MVP = projMat * transMat * rotMat * scaleMat;
+
+        for(unsigned y = 0; y < 4; ++y) {
+            std::cout << "| ";
+            for(unsigned x = 0; x < 4; ++x) {
+                std::cout << MVP.getVal(x, y) << " ";
+            }
+            std::cout << "|" << std::endl;
+        }
+        std::cout << "-----------------------------" << std::endl;
+
+        testMat.setUniformMat4("MVP", MVP);
+
         testMat.setUniform2f("mousePos", window.cursorX(), -(window.cursorY()-window.fbHeight()));
+
+        if(window.keyDown(GLFW_KEY_W)) {
+            pos.y += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_S)) {
+            pos.y -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_A)) {
+            pos.x -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_D)) {
+            pos.x += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_Q)) {
+            pos.z += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_E)) {
+            pos.z -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_UP)) {
+            scale.y += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_DOWN)) {
+            scale.y -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_LEFT)) {
+            scale.x += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_RIGHT)) {
+            scale.x -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_Z)) {
+            rot -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_X)) {
+            rot += 0.01;
+        }
 
         if(window.keyDown(GLFW_KEY_ESCAPE)) {
             break;

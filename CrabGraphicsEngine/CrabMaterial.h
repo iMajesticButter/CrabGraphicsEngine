@@ -8,6 +8,10 @@
 
 #include "CrabWindow.h"
 #include "CrabShader.h"
+#include "CrabVec2.h"
+#include "CrabVec3.h"
+#include "CrabVec4.h"
+#include "CrabMat4.h"
 
 namespace CrabEngine {
     namespace Graphics {
@@ -47,6 +51,12 @@ namespace CrabEngine {
             void setUniform4ui (const std::string name, const unsigned val1, const unsigned val2, const unsigned val3, const unsigned val4);
             void setUniform4f  (const std::string name, const float val1,    const float val2,    const float val3,    const float val4);
             void setUniform4d  (const std::string name, const double val1,   const double val2,   const double val3,   const double val4);
+
+            void setUniform2f  (const std::string name, const CrabEngine::Math::Vec2& vec);
+            void setUniform3f  (const std::string name, const CrabEngine::Math::Vec3& vec);
+            void setUniform4f  (const std::string name, const CrabEngine::Math::Vec4& vec);
+
+            void setUniformMat4(const std::string name, CrabEngine::Math::Mat4& mat);
 
         private:
 
