@@ -94,6 +94,10 @@ namespace CrabEngine {
                 glAttachShader(m_program, shaders[i]);
             }
 
+            //attribute locations
+            //glBindAttribLocation(m_program, 0, "inPos");
+            //glBindAttribLocation(m_program, 1, "inColor");
+
             //link Program
             glLinkProgram(m_program);
 

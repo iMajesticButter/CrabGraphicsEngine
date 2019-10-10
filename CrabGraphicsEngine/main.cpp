@@ -17,7 +17,8 @@
     std::cerr << "ERROR: " << description << std::endl;
 }*/
 
-GLuint vertexBuf;
+GLuint vertexBuf[2];
+GLuint VAO;
 
 void InitOpenGL() {
     /*static const char* vertex_shader_text =
@@ -40,22 +41,37 @@ void InitOpenGL() {
 
     //triangle
     const GLfloat gVertBufData[] = {
-        0.0f,   1.0f,   0.0f,
-        1.0f,  -1.0f,   0.0f,
-       -1.0f,  -1.0f,   0.0f
+        0.0f,   1.0f,
+        1.0f,  -1.0f,
+       -1.0f,  -1.0f
     };
 
-    GLuint VertArray;
-    glGenVertexArrays(1, &VertArray);
-    glBindVertexArray(VertArray);
+    const GLfloat gColBufData[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
+    //GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     //GLint Result = GL_FALSE;
 	//int InfoLogLength;
 
-    //create vertex buffer
-    glGenBuffers(1, &vertexBuf);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuf);
+    //create vertex buffer (coordinates)
+    glGenBuffers(2, vertexBuf);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuf[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gVertBufData), gVertBufData, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //create vertex buffer (colors)
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuf[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gColBufData), gColBufData, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
 
     /*GLuint VertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(VertShader, 1, &vertex_shader_text, nullptr);
@@ -151,6 +167,8 @@ int main() {
     bool fullscreen = false;
     bool borderless = false;
 
+    float lightRange = 3;
+
     while(!window.shouldClose()) {
 
         window.update();
@@ -162,14 +180,18 @@ int main() {
         PerspectiveProjectionMatrix projMat(30.0f, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
 
         //draw triangle test
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuf);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        //glEnableVertexAttribArray(0);
+        //glBindBuffer(GL_ARRAY_BUFFER, VAO);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        glBindVertexArray(VAO);
 
         //glUseProgram(program);
         testMat.use();
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDisableVertexAttribArray(0);
+        //glDisableVertexAttribArray(0);
+
+        glBindVertexArray(0);
 
         //printf("mouseY: %f\n", -(mouseY-height/2));
 
@@ -184,18 +206,19 @@ int main() {
         TranslationMatrix transMat(pos);
         Mat4 MVP = projMat * transMat * rotMat * scaleMat;
 
-        for(unsigned y = 0; y < 4; ++y) {
+        /*for(unsigned y = 0; y < 4; ++y) {
             std::cout << "| ";
             for(unsigned x = 0; x < 4; ++x) {
                 std::cout << MVP.getVal(x, y) << " ";
             }
             std::cout << "|" << std::endl;
         }
-        std::cout << "-----------------------------" << std::endl;
+        std::cout << "-----------------------------" << std::endl;*/
 
         testMat.setUniformMat4("MVP", MVP);
 
         testMat.setUniform2f("mousePos", window.cursorX(), -(window.cursorY()-window.fbHeight()));
+        testMat.setUniform1f("lightRange", lightRange);
 
         if(window.keyDown(GLFW_KEY_W)) {
             pos.y += 0.01;
@@ -232,6 +255,12 @@ int main() {
         }
         if(window.keyDown(GLFW_KEY_X)) {
             rot += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_EQUAL)) {
+            lightRange += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_MINUS)) {
+            lightRange -= 0.01;
         }
 
         if(window.keyDown(GLFW_KEY_ESCAPE)) {
