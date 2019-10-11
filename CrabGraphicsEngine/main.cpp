@@ -52,21 +52,19 @@ void InitOpenGL() {
     "}\n";*/
 
     //triangle
-    const GLfloat gVertBufData[] = {
+    /*const GLfloat gVertBufData[] = {
         1.0f,   1.0f,       0.0f,       1.0f, 0.0f, 0.0f,
         1.0f,  -1.0f,       0.0f,       0.0f, 1.0f, 0.0f,
        -1.0f,  -1.0f,       0.0f,       0.0f, 0.0f, 1.0f,
        -1.0f,   1.0f,       0.0f,       0.0f, 1.0f, 0.0f
-   };
+   };*/
 
-    /*const GLfloat gVertBufData[] = {
+    const GLfloat gVertBufData[] = {
        1.0f,   1.0f,
        1.0f,  -1.0f,
       -1.0f,  -1.0f,
-       1.0f,   1.0f,
-      -1.0f,  -1.0f,
       -1.0f,   1.0f
-  };*/
+  };
 
     const GLuint gVertInxData[] = {
         0, 1, 2,
@@ -85,9 +83,9 @@ void InitOpenGL() {
     vbo = new VBO(VBOusage::STATIC);
     vbo->bind();
 
-    VBOlayout layout(3*sizeof(GLfloat));
-    layout.addAttribute("inPos", GL_FLOAT, 3, 3*sizeof(GLfloat));
-    layout.addAttribute("inColor", GL_FLOAT, 3, 3*sizeof(GLfloat));
+    VBOlayout layout(0);
+    layout.addAttribute("inPos", GL_FLOAT, 2, 2*sizeof(GLfloat));
+    //layout.addAttribute("inColor", GL_FLOAT, 3, 3*sizeof(GLfloat));
     vbo->setLayout(layout);
     vbo->setData(sizeof(gVertBufData), gVertBufData);
 
