@@ -4,7 +4,10 @@
 #include <GLEW/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "CrabWindow.h"
+
 #include <vector>
+#include <string>
 
 namespace CrabEngine {
     namespace Graphics {
@@ -20,6 +23,8 @@ namespace CrabEngine {
             GLuint count;
             GLboolean normalized;
             GLuint offset;
+            GLuint location;
+            std::string name;
         };
 
         class VBOlayout {
@@ -28,13 +33,14 @@ namespace CrabEngine {
             VBOlayout(const VBOlayout& other);
             VBOlayout(GLuint stride);
 
-            void addAttribute(GLenum type, GLuint count, GLuint size, GLboolean normalized = GL_FALSE);
+            void addAttribute(std::string name, GLenum type, GLuint count, GLuint size, GLboolean normalized = GL_FALSE);
             void clearAttributes();
 
             friend VBO;
         private:
             std::vector<VBOattribute> m_attributes;
             GLuint m_stride;
+            GLuint m_index;
             unsigned m_count;
         };
 
@@ -56,6 +62,7 @@ namespace CrabEngine {
             GLuint m_vbo;
             unsigned m_size;
             VBOlayout m_layout;
+            Window* m_window;
         };
     }
 }

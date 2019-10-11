@@ -9,6 +9,9 @@
 #include "CrabVec3.h"
 #include "CrabVec4.h"
 #include "CrabMat4.h"
+#include "CrabVBO.h"
+#include "CrabVAO.h"
+#include "CrabIBO.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -17,10 +20,19 @@
     std::cerr << "ERROR: " << description << std::endl;
 }*/
 
-GLuint vertexBuf[2];
-GLuint VAO;
+//GLuint vertexBuf[2];
+//GLuint VAO;
+
+using CrabEngine::Graphics::VAO;
+using CrabEngine::Graphics::VBO;
+using CrabEngine::Graphics::IBO;
+
+VBO* vbo = nullptr;
+VAO* vao = nullptr;
+IBO* ibo = nullptr;
 
 void InitOpenGL() {
+    using namespace CrabEngine::Graphics;
     /*static const char* vertex_shader_text =
     "#version 330\n"
     "layout(location = 0) in vec3 inPos;\n"
@@ -41,25 +53,63 @@ void InitOpenGL() {
 
     //triangle
     const GLfloat gVertBufData[] = {
-        1.0f,   1.0f,
-        1.0f,  -1.0f,
-       -1.0f,  -1.0f,
-        1.0f,   1.0f,
-       -1.0f,  -1.0f,
-       -1.0f,   1.0f
+        1.0f,   1.0f,       0.0f,       1.0f, 0.0f, 0.0f,
+        1.0f,  -1.0f,       0.0f,       0.0f, 1.0f, 0.0f,
+       -1.0f,  -1.0f,       0.0f,       0.0f, 0.0f, 1.0f,
+       -1.0f,   1.0f,       0.0f,       0.0f, 1.0f, 0.0f
+   };
+
+    /*const GLfloat gVertBufData[] = {
+       1.0f,   1.0f,
+       1.0f,  -1.0f,
+      -1.0f,  -1.0f,
+       1.0f,   1.0f,
+      -1.0f,  -1.0f,
+      -1.0f,   1.0f
+  };*/
+
+    const GLuint gVertInxData[] = {
+        0, 1, 2,
+        0, 3, 2
     };
 
-    const GLfloat gColBufData[] = {
+    if(vao != nullptr)
+        delete vao;
+
+    vao = new VAO();
+    vao->bind();
+
+    if(vbo != nullptr)
+        delete vbo;
+
+    vbo = new VBO(VBOusage::STATIC);
+    vbo->bind();
+
+    VBOlayout layout(3);
+    layout.addAttribute("inPos", GL_FLOAT, 3, 3*sizeof(GLfloat));
+    layout.addAttribute("inColor", GL_FLOAT, 3, 3*sizeof(GLfloat));
+    vbo->setLayout(layout);
+    vbo->setData(sizeof(gVertBufData), gVertBufData);
+
+    if(ibo != nullptr)
+        delete ibo;
+
+    ibo = new IBO(gVertInxData, 6);
+
+    vbo->unbind();
+    vao->unbind();
+
+    /*const GLfloat gColBufData[] = {
         1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f,
         0.0f, 1.0f, 0.0f
-    };
+    };*/
 
     //GLuint VAO;
-    glGenVertexArrays(1, &VAO);
+    /*glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     //GLint Result = GL_FALSE;
@@ -77,7 +127,7 @@ void InitOpenGL() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuf[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(gColBufData), gColBufData, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(1);*/
 
     /*GLuint VertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(VertShader, 1, &vertex_shader_text, nullptr);
@@ -190,14 +240,20 @@ int main() {
         //glBindBuffer(GL_ARRAY_BUFFER, VAO);
         //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
 
         //glUseProgram(program);
-        testMat.use();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        vao->bind();
+        ibo->bind();
+        testMat.bind();
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        vao->draw(6);
+        testMat.unbind();
+        ibo->unbind();
+        vao->unbind();
         //glDisableVertexAttribArray(0);
 
-        glBindVertexArray(0);
+        //glBindVertexArray(0);
 
         //printf("mouseY: %f\n", -(mouseY-height/2));
 

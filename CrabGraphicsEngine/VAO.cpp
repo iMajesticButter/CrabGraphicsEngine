@@ -4,24 +4,21 @@ namespace CrabEngine {
     namespace Graphics {
 
         VAO::VAO() {
+            glGenVertexArrays(1, &m_vao);
         }
         VAO::~VAO() {
-        }
-
-        void VAO::pushBuffer(VBO* vbo) {
-            m_vbos.push_back(vbo);
+            glDeleteVertexArrays(1, &m_vao);
         }
 
         void VAO::bind() {
-            m_vbos.front()->bind();
+            glBindVertexArray(m_vao);
         }
         void VAO::unbind() {
-            m_vbos.front()->unbind();
+            glBindVertexArray(0);
         }
 
         void VAO::draw(unsigned count) {
             glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL);
         }
-
     }
 }
