@@ -57,14 +57,15 @@ void InitOpenGL() {
         1.0f,  -1.0f,       0.0f,       0.0f, 1.0f, 0.0f,
        -1.0f,  -1.0f,       0.0f,       0.0f, 0.0f, 1.0f,
        -1.0f,   1.0f,       0.0f,       0.0f, 1.0f, 0.0f
-   };*/
+    };*/
 
     const GLfloat gVertBufData[] = {
-       1.0f,   1.0f,
-       1.0f,  -1.0f,
-      -1.0f,  -1.0f,
-      -1.0f,   1.0f
-  };
+     //x       y                   r     g     b            test
+       1.0f,   1.0f,               1.0f, 0.0f, 0.0f,        1.0f,
+       1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,        0.0f,
+      -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,        0.0f,
+      -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,        0.0f
+    };
 
     const GLuint gVertInxData[] = {
         0, 1, 2,
@@ -83,9 +84,10 @@ void InitOpenGL() {
     vbo = new VBO(VBOusage::STATIC);
     vbo->bind();
 
-    VBOlayout layout(0);
-    layout.addAttribute("inPos", GL_FLOAT, 2, 2*sizeof(GLfloat));
-    //layout.addAttribute("inColor", GL_FLOAT, 3, 3*sizeof(GLfloat));
+    VBOlayout layout(6*sizeof(GLfloat));
+    layout.addAttribute("inPos", GL_FLOAT, 2, sizeof(GLfloat));
+    layout.addAttribute("inColor", GL_FLOAT, 3, sizeof(GLfloat));
+    layout.addAttribute("name", GL_FLOAT, 1, sizeof(GLfloat));
     vbo->setLayout(layout);
     vbo->setData(sizeof(gVertBufData), gVertBufData);
 
@@ -189,7 +191,7 @@ int main() {
     testMat.Initialize();
 
     Vec3 pos(0, 0, 10);
-    Vec2 scale(1, 0.5);
+    Vec2 scale(1, 1);
     float rot = 0 * (M_PI/180);
 
 
@@ -221,7 +223,7 @@ int main() {
     bool fullscreen = false;
     bool borderless = false;
 
-    float lightRange = 3;
+    float lightRange = 2;
 
     while(!window.shouldClose()) {
 

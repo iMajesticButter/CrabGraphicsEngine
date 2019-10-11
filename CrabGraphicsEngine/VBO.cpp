@@ -25,7 +25,7 @@ namespace CrabEngine {
             attr.offset = m_count;
             attr.location = m_index;
             attr.name = name;
-            m_count += size;
+            m_count += count*size;
             ++m_index;
             m_attributes.push_back(attr);
         }
