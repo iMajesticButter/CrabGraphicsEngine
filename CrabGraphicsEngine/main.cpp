@@ -85,7 +85,7 @@ void InitOpenGL() {
     vbo = new VBO(VBOusage::STATIC);
     vbo->bind();
 
-    VBOlayout layout(3);
+    VBOlayout layout(3*sizeof(GLfloat));
     layout.addAttribute("inPos", GL_FLOAT, 3, 3*sizeof(GLfloat));
     layout.addAttribute("inColor", GL_FLOAT, 3, 3*sizeof(GLfloat));
     vbo->setLayout(layout);
