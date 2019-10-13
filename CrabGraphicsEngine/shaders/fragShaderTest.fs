@@ -1,7 +1,7 @@
 #version 330
 
 in vec3 VColor;
-in float oTest;
+//in float oTest;
 in vec2 uvCoord;
 
 out vec4 color;
@@ -13,7 +13,7 @@ uniform sampler2D tex2;
 void main() {
 
     float dist = distance(mousePos, gl_FragCoord.xy)/400/lightRange;
-    dist = clamp(1-dist, 0, 1)+oTest/2;
+    dist = clamp(1-dist, 0, 1);
     //color = VColor * dist;
     //color = VColor * oTest;
     //color = vec4(1,1,1,1);

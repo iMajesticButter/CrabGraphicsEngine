@@ -13,6 +13,8 @@
 #include "CrabVAO.h"
 #include "CrabIBO.h"
 #include "CrabGraphicsUtils.h"
+#include "CrabTexture.h"
+#include "CrabMesh.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -62,7 +64,7 @@ void InitOpenGL() {
        -1.0f,   1.0f,       0.0f,       0.0f, 1.0f, 0.0f
     };*/
 
-    const GLfloat gVertBufData[] = {
+    /*const GLfloat gVertBufData[] = {
        //x       y                   r     g     b             s     t          test
          1.0f,   1.0f,               1.0f, 0.0f, 0.0f,         1.0f, 1.0f,      0.0f,
          1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,         1.0f, 0.0f,      0.0f,
@@ -74,7 +76,7 @@ void InitOpenGL() {
     const GLuint gVertInxData[] = {
         0, 1, 2,
         0, 3, 2
-    };
+    };*/
 
     if(vao != nullptr)
         delete vao;
@@ -86,7 +88,7 @@ void InitOpenGL() {
         delete vbo;
 
     vbo = new VBO(VBOusage::STATIC);
-    vbo->bind();
+    /*vbo->bind();
 
     VBOlayout layout;
     layout.addAttribute(GL_FLOAT, 2, sizeof(GLfloat));
@@ -95,18 +97,18 @@ void InitOpenGL() {
     layout.addAttribute(GL_FLOAT, 1, sizeof(GLfloat));
 
     vbo->setLayout(layout);
-    vbo->setData(sizeof(gVertBufData), gVertBufData);
+    vbo->setData(sizeof(gVertBufData), gVertBufData);*/
 
     if(ibo != nullptr)
         delete ibo;
 
-    ibo = new IBO(gVertInxData, 6);
+    //ibo = new IBO(gVertInxData, 6);
 
-    vbo->unbind();
+    //vbo->unbind();
     vao->unbind();
 
     //load texture
-    textureData data = CrabEngine::Graphics::loadBitmap("textures/crab.bmp");
+    /*textureData data = CrabEngine::Graphics::loadBitmap("textures/crab.bmp");
 
     glGenTextures(1, &texture);
 
@@ -122,7 +124,7 @@ void InitOpenGL() {
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.width, data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data.data.front());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D);*/
 
     /*const GLfloat gColBufData[] = {
         1.0f, 0.0f, 0.0f,
@@ -215,8 +217,46 @@ int main() {
     testMat.AddShader(fragShader);
     testMat.Initialize();
 
-    testMat.setUniform1i("tex", 0);
-    testMat.setUniform1i("tex2", 1);
+    Texture tex1(window);
+    tex1.loadBitmap("textures/crab.bmp");
+    tex1.setFilteringMode(LINEAR);
+    tex1.Init();
+
+    Texture tex2(window);
+    tex2.loadBitmap("textures/realCrab.bmp");
+    tex2.setFilteringMode(LINEAR);
+    tex2.Init();
+
+
+    Mesh mesh;
+
+    std::vector<Vec2> vertecies;
+    vertecies.push_back(Vec2( 1.0f,  1.0f));
+    vertecies.push_back(Vec2(-1.0f,  1.0f));
+    vertecies.push_back(Vec2( 1.0f, -1.0f));
+    vertecies.push_back(Vec2(-1.0f, -1.0f));
+
+    std::vector<Vec3> vertColors;
+    vertColors.push_back(Vec3( 1.0f,  0.0f,  0.0f));
+    vertColors.push_back(Vec3( 0.0f,  1.0f,  0.0f));
+    vertColors.push_back(Vec3( 0.0f,  0.0f,  1.0f));
+    vertColors.push_back(Vec3( 0.0f,  1.0f,  0.0f));
+
+    std::vector<Vec2> uvCoords;
+    uvCoords.push_back(Vec2( 1.0f,  1.0f));
+    uvCoords.push_back(Vec2( 0.0f,  1.0f));
+    uvCoords.push_back(Vec2( 1.0f,  0.0f));
+    uvCoords.push_back(Vec2( 0.0f,  0.0f));
+
+    std::vector<unsigned int> tris = {
+        0, 1, 2,
+        0, 3, 2
+    };
+
+    mesh.vertecies = vertecies;
+    mesh.colors = vertColors;
+    mesh.uvCooordinates = uvCoords;
+    mesh.triangles = tris;
 
     Vec3 pos(0, 0, 10);
     Vec2 scale(1, 1);
@@ -255,6 +295,9 @@ int main() {
 
     while(!window.shouldClose()) {
 
+        testMat.setUniform1i("tex", 0);
+        testMat.setUniform1i("tex2", 1);
+
         window.update();
 
         glViewport(0, 0, window.fbWidth(), window.fbHeight());
@@ -272,8 +315,13 @@ int main() {
 
         //glUseProgram(program);
         vao->bind();
+        vbo->setLayout(mesh.getLayout());
+        std::vector<unsigned char> data = mesh.getVertexData();
+        vbo->setData(data.size(), &data.front());
         ibo->bind();
         testMat.bind();
+        tex1.bind(0);
+        tex2.bind(1);
         //vbo->bindAttributeLocations(testMat);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         vao->draw(6);

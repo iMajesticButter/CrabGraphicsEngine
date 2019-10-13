@@ -35,9 +35,9 @@ namespace CrabEngine {
             void addAttribute(GLenum type, GLuint count, GLuint size, GLboolean normalized = GL_FALSE);
             void clearAttributes();
 
+            std::vector<VBOattribute> m_attributes;
             friend VBO;
         private:
-            std::vector<VBOattribute> m_attributes;
             GLuint m_stride;
             GLuint m_index;
             unsigned m_count;
