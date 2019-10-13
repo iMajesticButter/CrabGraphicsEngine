@@ -70,13 +70,13 @@ void InitOpenGL() {
          1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,         1.0f, 0.0f,      0.0f,
         -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,         0.0f, 0.0f,      0.0f,
         -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,         0.0f, 1.0f,      0.0f
-    };
+    };*/
 
 
     const GLuint gVertInxData[] = {
         0, 1, 2,
         0, 3, 2
-    };*/
+    };
 
     if(vao != nullptr)
         delete vao;
@@ -102,7 +102,7 @@ void InitOpenGL() {
     if(ibo != nullptr)
         delete ibo;
 
-    //ibo = new IBO(gVertInxData, 6);
+    ibo = new IBO(gVertInxData, 6);
 
     //vbo->unbind();
     vao->unbind();
