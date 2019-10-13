@@ -12,6 +12,7 @@
 #include "CrabVBO.h"
 #include "CrabVAO.h"
 #include "CrabIBO.h"
+#include "CrabGraphicsUtils.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -30,6 +31,8 @@ using CrabEngine::Graphics::IBO;
 VBO* vbo = nullptr;
 VAO* vao = nullptr;
 IBO* ibo = nullptr;
+
+GLuint texture;
 
 void InitOpenGL() {
     using namespace CrabEngine::Graphics;
@@ -60,12 +63,13 @@ void InitOpenGL() {
     };*/
 
     const GLfloat gVertBufData[] = {
-     //x       y                   r     g     b            test
-       1.0f,   1.0f,               1.0f, 0.0f, 0.0f,        1.0f,
-       1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,        0.0f,
-      -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,        0.0f,
-      -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,        0.0f
+       //x       y                   r     g     b            test          s     t
+         1.0f,   1.0f,               1.0f, 0.0f, 0.0f,        1.0f,         1.0f, 1.0f,
+         1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,        0.0f,         1.0f, 0.0f,
+        -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,        0.0f,         0.0f, 0.0f,
+        -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,        0.0f,         0.0f, 1.0f
     };
+
 
     const GLuint gVertInxData[] = {
         0, 1, 2,
@@ -84,10 +88,11 @@ void InitOpenGL() {
     vbo = new VBO(VBOusage::STATIC);
     vbo->bind();
 
-    VBOlayout layout(6*sizeof(GLfloat));
+    VBOlayout layout(8*sizeof(GLfloat));
     layout.addAttribute("inPos", GL_FLOAT, 2, sizeof(GLfloat));
     layout.addAttribute("inColor", GL_FLOAT, 3, sizeof(GLfloat));
     layout.addAttribute("name", GL_FLOAT, 1, sizeof(GLfloat));
+    layout.addAttribute("in_uvCoord", GL_FLOAT, 2, sizeof(GLfloat));
     vbo->setLayout(layout);
     vbo->setData(sizeof(gVertBufData), gVertBufData);
 
@@ -98,6 +103,25 @@ void InitOpenGL() {
 
     vbo->unbind();
     vao->unbind();
+
+    //load texture
+    textureData data = CrabEngine::Graphics::loadBitmap("textures/crab.bmp");
+
+    glGenTextures(1, &texture);
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.width, data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data.data.front());
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    data = CrabEngine::Graphics::loadBitmap("textures/realCrab.bmp");
+
+    glGenTextures(1, &texture);
+
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, data.width, data.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data.data.front());
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     /*const GLfloat gColBufData[] = {
         1.0f, 0.0f, 0.0f,
@@ -189,6 +213,9 @@ int main() {
     testMat.AddShader(vertShader);
     testMat.AddShader(fragShader);
     testMat.Initialize();
+
+    testMat.setUniform1i("tex", 0);
+    testMat.setUniform1i("tex2", 1);
 
     Vec3 pos(0, 0, 10);
     Vec2 scale(1, 1);
