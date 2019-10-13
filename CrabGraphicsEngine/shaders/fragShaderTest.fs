@@ -12,11 +12,13 @@ uniform sampler2D tex2;
 
 void main() {
 
-    //float dist = distance(mousePos, gl_FragCoord.xy)/400/lightRange;
-    //dist = clamp(1-dist, 0, 1)+oTest/2;
+    float dist = distance(mousePos, gl_FragCoord.xy)/400/lightRange;
+    dist = clamp(1-dist, 0, 1)+oTest/2;
     //color = VColor * dist;
     //color = VColor * oTest;
     //color = vec4(1,1,1,1);
     vec4 tex1Col = texture(tex, uvCoord);
-    color = tex1Col + texture(tex2, uvCoord) * (1.0 - tex1Col.w);
+    vec4 col = tex1Col + texture(tex2, uvCoord) * (1.0 - tex1Col.w);
+
+    color = (col/2 + vec4(VColor, 1.0)/30) * dist;
 }

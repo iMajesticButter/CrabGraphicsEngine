@@ -100,8 +100,9 @@ namespace CrabEngine {
             }
 
             //attribute locations
-            //glBindAttribLocation(m_program, 0, "inPos");
-            //glBindAttribLocation(m_program, 1, "inColor");
+            glBindAttribLocation(m_program, 0, "in_Position");
+            glBindAttribLocation(m_program, 1, "in_Color");
+            glBindAttribLocation(m_program, 2, "in_UV");
 
             //link Program
             glLinkProgram(m_program);

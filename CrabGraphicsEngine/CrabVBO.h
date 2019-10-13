@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "CrabWindow.h"
+#include "CrabMaterial.h"
 
 #include <vector>
 #include <string>
@@ -24,16 +25,14 @@ namespace CrabEngine {
             GLboolean normalized;
             GLuint offset;
             GLuint location;
-            std::string name;
         };
 
         class VBOlayout {
         public:
             VBOlayout();
             VBOlayout(const VBOlayout& other);
-            VBOlayout(GLuint stride);
 
-            void addAttribute(std::string name, GLenum type, GLuint count, GLuint size, GLboolean normalized = GL_FALSE);
+            void addAttribute(GLenum type, GLuint count, GLuint size, GLboolean normalized = GL_FALSE);
             void clearAttributes();
 
             friend VBO;

@@ -63,11 +63,11 @@ void InitOpenGL() {
     };*/
 
     const GLfloat gVertBufData[] = {
-       //x       y                   r     g     b            test          s     t
-         1.0f,   1.0f,               1.0f, 0.0f, 0.0f,        1.0f,         1.0f, 1.0f,
-         1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,        0.0f,         1.0f, 0.0f,
-        -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,        0.0f,         0.0f, 0.0f,
-        -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,        0.0f,         0.0f, 1.0f
+       //x       y                   r     g     b             s     t          test
+         1.0f,   1.0f,               1.0f, 0.0f, 0.0f,         1.0f, 1.0f,      0.0f,
+         1.0f,  -1.0f,               0.0f, 1.0f, 0.0f,         1.0f, 0.0f,      0.0f,
+        -1.0f,  -1.0f,               0.0f, 0.0f, 1.0f,         0.0f, 0.0f,      0.0f,
+        -1.0f,   1.0f,               1.0f, 1.0f, 0.0f,         0.0f, 1.0f,      0.0f
     };
 
 
@@ -88,11 +88,12 @@ void InitOpenGL() {
     vbo = new VBO(VBOusage::STATIC);
     vbo->bind();
 
-    VBOlayout layout(8*sizeof(GLfloat));
-    layout.addAttribute("inPos", GL_FLOAT, 2, sizeof(GLfloat));
-    layout.addAttribute("inColor", GL_FLOAT, 3, sizeof(GLfloat));
-    layout.addAttribute("name", GL_FLOAT, 1, sizeof(GLfloat));
-    layout.addAttribute("in_uvCoord", GL_FLOAT, 2, sizeof(GLfloat));
+    VBOlayout layout;
+    layout.addAttribute(GL_FLOAT, 2, sizeof(GLfloat));
+    layout.addAttribute(GL_FLOAT, 3, sizeof(GLfloat));
+    layout.addAttribute(GL_FLOAT, 2, sizeof(GLfloat));
+    layout.addAttribute(GL_FLOAT, 1, sizeof(GLfloat));
+
     vbo->setLayout(layout);
     vbo->setData(sizeof(gVertBufData), gVertBufData);
 
@@ -273,6 +274,7 @@ int main() {
         vao->bind();
         ibo->bind();
         testMat.bind();
+        //vbo->bindAttributeLocations(testMat);
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         vao->draw(6);
         testMat.unbind();
@@ -350,6 +352,9 @@ int main() {
         }
         if(window.keyDown(GLFW_KEY_MINUS)) {
             lightRange -= 0.01;
+            if(lightRange < 0) {
+                lightRange = 0;
+            }
         }
 
         if(window.keyDown(GLFW_KEY_ESCAPE)) {

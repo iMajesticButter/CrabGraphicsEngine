@@ -13,19 +13,16 @@ namespace CrabEngine {
         VBOlayout::VBOlayout(const VBOlayout& other) : m_stride(other.m_stride), m_index(other.m_index), m_count(other.m_count) {
             m_attributes = other.m_attributes;
         }
-        VBOlayout::VBOlayout(GLuint stride) : m_stride(stride), m_index(0), m_count(0) {
-            m_attributes = std::vector<VBOattribute>();
-        }
 
-        void VBOlayout::addAttribute(std::string name, GLenum type, GLuint count, GLuint size, GLboolean normalized) {
+        void VBOlayout::addAttribute(GLenum type, GLuint count, GLuint size, GLboolean normalized) {
             VBOattribute attr;
             attr.type = type;
             attr.count = count;
             attr.normalized = normalized;
             attr.offset = m_count;
             attr.location = m_index;
-            attr.name = name;
             m_count += count*size;
+            m_stride += count*size;
             ++m_index;
             m_attributes.push_back(attr);
         }
