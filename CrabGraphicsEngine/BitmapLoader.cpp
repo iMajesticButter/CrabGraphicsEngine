@@ -22,7 +22,7 @@ namespace CrabEngine {
             unsigned nWidth = width*numChanels+padding;
 
             unsigned char* data;
-            data = new unsigned char[width*numChanels];
+            data = new unsigned char[nWidth*numChanels];
 
             textureData output;
 

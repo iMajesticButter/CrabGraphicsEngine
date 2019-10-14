@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 VColor;
+//in vec3 VColor;
 //in float oTest;
 in vec2 uvCoord;
 
@@ -20,5 +20,6 @@ void main() {
     vec4 tex1Col = texture(tex, uvCoord);
     vec4 col = tex1Col + texture(tex2, uvCoord) * (1.0 - tex1Col.w);
 
-    color = (col/2 + vec4(VColor, 1.0)/30) * dist;
+    //color = (col/2 + vec4(VColor, 1.0)/30) * dist;
+    color = col * dist;
 }

@@ -16,14 +16,13 @@ namespace CrabEngine {
         public:
 
             std::vector<CrabEngine::Math::Vec2> vertecies;
-            std::vector<CrabEngine::Math::Vec3> colors;
             std::vector<CrabEngine::Math::Vec2> uvCooordinates;
 
             std::vector<unsigned int> triangles;
 
             Mesh();
 
-            std::vector<unsigned char> getVertexData();
+            std::vector<GLfloat> getVertexData();
 
             VBOlayout getLayout();
 

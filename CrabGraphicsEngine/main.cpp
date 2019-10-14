@@ -232,29 +232,22 @@ int main() {
 
     std::vector<Vec2> vertecies;
     vertecies.push_back(Vec2( 1.0f,  1.0f));
-    vertecies.push_back(Vec2(-1.0f,  1.0f));
     vertecies.push_back(Vec2( 1.0f, -1.0f));
     vertecies.push_back(Vec2(-1.0f, -1.0f));
-
-    std::vector<Vec3> vertColors;
-    vertColors.push_back(Vec3( 1.0f,  0.0f,  0.0f));
-    vertColors.push_back(Vec3( 0.0f,  1.0f,  0.0f));
-    vertColors.push_back(Vec3( 0.0f,  0.0f,  1.0f));
-    vertColors.push_back(Vec3( 0.0f,  1.0f,  0.0f));
+    vertecies.push_back(Vec2(-1.0f,  1.0f));
 
     std::vector<Vec2> uvCoords;
     uvCoords.push_back(Vec2( 1.0f,  1.0f));
-    uvCoords.push_back(Vec2( 0.0f,  1.0f));
     uvCoords.push_back(Vec2( 1.0f,  0.0f));
     uvCoords.push_back(Vec2( 0.0f,  0.0f));
+    uvCoords.push_back(Vec2( 0.0f,  1.0f));
 
-    std::vector<unsigned int> tris = {
+    std::vector<unsigned int> tris{
         0, 1, 2,
         0, 3, 2
     };
 
     mesh.vertecies = vertecies;
-    mesh.colors = vertColors;
     mesh.uvCooordinates = uvCoords;
     mesh.triangles = tris;
 
@@ -262,7 +255,16 @@ int main() {
     Vec2 scale(1, 1);
     float rot = 0 * (M_PI/180);
 
+    std::vector<GLfloat> data = mesh.getVertexData();
 
+    std::cout << vertecies.size() << std::endl;
+    std::cout << uvCoords.size() << std::endl;
+    std::cout << data.size() << std::endl;
+
+    for(unsigned i = 0; i < data.size(); ++i) {
+        std::cout << data[i] << ",";
+    }
+    std::cout << std::endl;
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -312,12 +314,14 @@ int main() {
         //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         //glBindVertexArray(VAO);
-
         //glUseProgram(program);
+
         vao->bind();
+
+        vbo->setData(sizeof(GLfloat)*data.size(), &data.front());
         vbo->setLayout(mesh.getLayout());
-        std::vector<unsigned char> data = mesh.getVertexData();
-        vbo->setData(data.size(), &data.front());
+
+
         ibo->bind();
         testMat.bind();
         tex1.bind(0);
@@ -425,6 +429,10 @@ int main() {
             }
         }
     }
+
+    delete vao;
+    delete vbo;
+    delete ibo;
 
     return 0;
 }

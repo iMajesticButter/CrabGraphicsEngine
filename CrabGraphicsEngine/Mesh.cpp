@@ -3,25 +3,24 @@
 namespace CrabEngine {
     namespace Graphics {
         Mesh::Mesh() {
+            m_layout.clearAttributes();
             m_layout.addAttribute(GL_FLOAT, 2, sizeof(GLfloat));
-            m_layout.addAttribute(GL_FLOAT, 3, sizeof(GLfloat));
             m_layout.addAttribute(GL_FLOAT, 2, sizeof(GLfloat));
         }
 
-        std::vector<unsigned char> Mesh::getVertexData() {
+        std::vector<GLfloat> Mesh::getVertexData() {
 
-            colors.resize(vertecies.size());
             uvCooordinates.resize(vertecies.size());
 
-            using namespace CrabEngine::Math;
-            std::vector<unsigned char> data;
-            unsigned vertSize = (sizeof(Vec2)*2) + sizeof(Vec3) + m_attributeSize;
-            data.resize(vertSize * vertecies.size());
+            std::vector<GLfloat> data;
+
             for(unsigned i = 0; i < vertecies.size(); ++i) {
-                memcpy(&data[i*vertSize], &vertecies[i], sizeof(Vec2));
-                memcpy(&data[i*vertSize]+sizeof(Vec2), &colors[i], sizeof(Vec3));
-                memcpy(&data[i*vertSize]+sizeof(Vec2) + sizeof(Vec3), &uvCooordinates[i], sizeof(Vec2));
+                data.push_back(vertecies[i].x);
+                data.push_back(vertecies[i].y);
+                data.push_back(uvCooordinates[i].x);
+                data.push_back(uvCooordinates[i].y);
             }
+
             return data;
         }
 
