@@ -3,14 +3,17 @@
 
 #include <GLEW/glew.h>
 #include "CrabWindow.h"
+#include "CrabVBO.h"
 
 namespace CrabEngine {
     namespace Graphics {
 
         class IBO {
         public:
-            IBO(const GLuint* data, GLuint count);
+            IBO(VBOusage usage);
             ~IBO();
+
+            void setData(const unsigned size, const void* data);
 
             void bind();
             void unbind();
@@ -21,6 +24,7 @@ namespace CrabEngine {
             GLuint m_ibo;
             GLuint m_count;
             Window* m_window;
+            GLenum m_usage;
         };
 
     }

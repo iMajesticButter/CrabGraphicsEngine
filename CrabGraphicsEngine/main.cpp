@@ -15,6 +15,7 @@
 #include "CrabGraphicsUtils.h"
 #include "CrabTexture.h"
 #include "CrabMesh.h"
+#include "CrabGraphicsObject2D.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -73,10 +74,10 @@ void InitOpenGL() {
     };*/
 
 
-    const GLuint gVertInxData[] = {
+    /*const GLuint gVertInxData[] = {
         0, 1, 2,
         0, 3, 2
-    };
+    };*/
 
     if(vao != nullptr)
         delete vao;
@@ -102,7 +103,7 @@ void InitOpenGL() {
     if(ibo != nullptr)
         delete ibo;
 
-    ibo = new IBO(gVertInxData, 6);
+    ibo = new IBO(VBOusage::STATIC);
 
     //vbo->unbind();
     vao->unbind();
@@ -255,7 +256,8 @@ int main() {
     Vec2 scale(1, 1);
     float rot = 0 * (M_PI/180);
 
-    std::vector<GLfloat> data = mesh.getVertexData();
+    //std::vector<GLfloat> data = mesh.getVertexData();
+    std::vector<GLfloat> data;
 
     std::cout << vertecies.size() << std::endl;
     std::cout << uvCoords.size() << std::endl;
@@ -265,6 +267,21 @@ int main() {
         std::cout << data[i] << ",";
     }
     std::cout << std::endl;
+
+
+    std::vector<GraphicsObject2D*> objects;
+
+    GraphicsObject2D obj1(&mesh, &testMat);
+    obj1.setTexture("tex", &tex1);
+    obj1.setTexture("tex2", &tex2);
+
+    objects.push_back(&obj1);
+
+    GraphicsObject2D obj2(&mesh, &testMat);
+    obj1.setTexture("tex", &tex1);
+    obj1.setTexture("tex2", &tex2);
+
+    objects.push_back(&obj2);
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -297,6 +314,14 @@ int main() {
 
     while(!window.shouldClose()) {
 
+        obj1.location = pos;
+        obj1.scale = scale;
+        obj1.rotation = rot;
+
+        obj2.location = pos + Vec3(2, 0, 0);
+        obj2.scale = scale;
+        obj2.rotation = rot;
+
         testMat.setUniform1i("tex", 0);
         testMat.setUniform1i("tex2", 1);
 
@@ -317,19 +342,38 @@ int main() {
         //glUseProgram(program);
 
         vao->bind();
+        for(unsigned i = 0; i < objects.size(); ++i) {
+            data = objects[i]->getMesh()->getVertexData();
+            vbo->setData(sizeof(GLfloat)*data.size(), &data.front());
+            vbo->setLayout(objects[i]->getMesh()->getLayout());
 
-        vbo->setData(sizeof(GLfloat)*data.size(), &data.front());
-        vbo->setLayout(mesh.getLayout());
+            ibo->setData(sizeof(unsigned int)*objects[i]->getMesh()->triangles.size(), &objects[i]->getMesh()->triangles.front());
+
+            //testMat.bind();
+            objects[i]->getMaterial()->bind();
+            objects[i]->applyUniforms();
+
+            ScaleMatrix scaleMat(objects[i]->scale);
+            RotationMatrix2D rotMat(objects[i]->rotation);
+            TranslationMatrix transMat(objects[i]->location);
+            Mat4 MVP = projMat * transMat * rotMat * scaleMat;
+
+            objects[i]->getMaterial()->setUniformMat4("MVP", MVP);
 
 
-        ibo->bind();
-        testMat.bind();
-        tex1.bind(0);
-        tex2.bind(1);
-        //vbo->bindAttributeLocations(testMat);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        vao->draw(6);
-        testMat.unbind();
+            tex1.bind(0);
+            tex2.bind(1);
+
+            //for(unsigned j = 0; j < objects[i]->getTextureCount(); ++objects[i]) {
+            //    objects[i]->getTexture(j).tex->bind(j);
+            //    objects[i]->getMaterial()->setUniform1i(objects[i]->getTexture(j).name, j);
+            //}
+
+            //vbo->bindAttributeLocations(testMat);
+            //glDrawArrays(GL_TRIANGLES, 0, 6);
+            vao->draw(6);
+            testMat.unbind();
+        }
         ibo->unbind();
         vao->unbind();
         //glDisableVertexAttribArray(0);
@@ -344,10 +388,10 @@ int main() {
         //}
 
         //create transformation matrix
-        ScaleMatrix scaleMat(scale);
+        /*ScaleMatrix scaleMat(scale);
         RotationMatrix2D rotMat(rot);
         TranslationMatrix transMat(pos);
-        Mat4 MVP = projMat * transMat * rotMat * scaleMat;
+        Mat4 MVP = projMat * transMat * rotMat * scaleMat;*/
 
         /*for(unsigned y = 0; y < 4; ++y) {
             std::cout << "| ";
@@ -358,7 +402,7 @@ int main() {
         }
         std::cout << "-----------------------------" << std::endl;*/
 
-        testMat.setUniformMat4("MVP", MVP);
+        //testMat.setUniformMat4("MVP", MVP);
 
         testMat.setUniform2f("mousePos", window.cursorX(), -(window.cursorY()-window.fbHeight()));
         testMat.setUniform1f("lightRange", lightRange);

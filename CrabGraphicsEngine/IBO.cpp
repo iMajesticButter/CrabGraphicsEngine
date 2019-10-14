@@ -2,13 +2,18 @@
 
 namespace CrabEngine {
     namespace Graphics {
-        IBO::IBO(const GLuint* data, GLuint count) : m_count(count) {
+        IBO::IBO(VBOusage usage) {
             glGenBuffers(1, &m_ibo);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, count*sizeof(GLuint), data, GL_STATIC_DRAW);
+            m_usage = usage == STATIC ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
         }
         IBO::~IBO() {
             glDeleteBuffers(1, &m_ibo);
+        }
+
+        void IBO::setData(const unsigned count, const void* data) {
+            m_count = count;
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count*sizeof(GLuint), data, m_usage);
         }
 
         void IBO::bind() {
