@@ -201,6 +201,9 @@ void InitOpenGL() {
     glDetachShader(program, fragShader.getShaderID());*/
 
     //return program;
+
+    glEnable(GL_DEPTH_TEST);
+
 }
 
 int main() {
@@ -271,17 +274,31 @@ int main() {
 
     std::vector<GraphicsObject2D*> objects;
 
+
+    float obj1bt = 1.0f;
+    float obj2bt = 1.0f;
+    float obj3bt = 1.0f;
+
     GraphicsObject2D obj1(&mesh, &testMat);
     obj1.setTexture("tex", &tex1);
     obj1.setTexture("tex2", &tex2);
+    obj1.setUniform1f("backTest", obj1bt);
 
     objects.push_back(&obj1);
 
     GraphicsObject2D obj2(&mesh, &testMat);
-    obj1.setTexture("tex", &tex1);
-    obj1.setTexture("tex2", &tex2);
+    obj2.setTexture("tex", &tex1);
+    obj2.setTexture("tex2", &tex2);
+    obj2.setUniform1f("backTest", obj2bt);
 
     objects.push_back(&obj2);
+
+    GraphicsObject2D obj3(&mesh, &testMat);
+    obj3.setTexture("tex", &tex1);
+    obj3.setTexture("tex2", &tex2);
+    obj3.setUniform1f("backTest", obj3bt);
+
+    objects.push_back(&obj3);
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -312,23 +329,30 @@ int main() {
 
     float lightRange = 2;
 
+    bool pressed = false;
+
     while(!window.shouldClose()) {
 
         obj1.location = pos;
         obj1.scale = scale;
         obj1.rotation = rot;
 
-        obj2.location = pos + Vec3(2, 0, 0);
+        obj2.location = pos + Vec3(2, 0, 3);
         obj2.scale = scale;
         obj2.rotation = rot;
 
-        testMat.setUniform1i("tex", 0);
-        testMat.setUniform1i("tex2", 1);
+        obj3.location = pos - Vec3(2, 0, 3);
+        obj3.scale = scale;
+        obj3.rotation = rot;
+
+        //testMat.setUniform1i("tex", 0);
+        //testMat.setUniform1i("tex2", 1);
 
         window.update();
 
         glViewport(0, 0, window.fbWidth(), window.fbHeight());
         glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         //create projection matrix
         PerspectiveProjectionMatrix projMat(30.0f, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
@@ -359,19 +383,20 @@ int main() {
             Mat4 MVP = projMat * transMat * rotMat * scaleMat;
 
             objects[i]->getMaterial()->setUniformMat4("MVP", MVP);
+            //objects[i]->getMaterial()->setUniform1f("backTest", 0.5f);
 
 
-            tex1.bind(0);
-            tex2.bind(1);
+            //tex1.bind(0);
+            //tex2.bind(1);
 
-            //for(unsigned j = 0; j < objects[i]->getTextureCount(); ++objects[i]) {
-            //    objects[i]->getTexture(j).tex->bind(j);
-            //    objects[i]->getMaterial()->setUniform1i(objects[i]->getTexture(j).name, j);
-            //}
+            for(unsigned j = 0; j < objects[i]->getTextureCount(); ++j) {
+                objects[i]->getTexture(j).tex->bind(j);
+                objects[i]->getMaterial()->setUniform1i(objects[i]->getTexture(j).name, j);
+            }
 
             //vbo->bindAttributeLocations(testMat);
             //glDrawArrays(GL_TRIANGLES, 0, 6);
-            vao->draw(6);
+            vao->draw(objects[i]->getMesh()->triangles.size());
             testMat.unbind();
         }
         ibo->unbind();
@@ -451,6 +476,42 @@ int main() {
             if(lightRange < 0) {
                 lightRange = 0;
             }
+        }
+
+        if(window.keyDown(GLFW_KEY_1) && !pressed) {
+            if(obj1bt == 1.0f) {
+                obj1bt = 0.0f;
+            } else {
+                obj1bt = 1.0f;
+            }
+            obj1.setUniform1f("backTest", obj1bt);
+            pressed = true;
+        }
+        if(window.keyDown(GLFW_KEY_2) && !pressed) {
+            if(obj2bt == 1.0f) {
+                obj2bt = 0.0f;
+            } else {
+                obj2bt = 1.0f;
+            }
+            obj2.setUniform1f("backTest", obj2bt);
+            pressed = true;
+        }
+        if(window.keyDown(GLFW_KEY_3) && !pressed) {
+            if(obj3bt == 1.0f) {
+                obj3bt = 0.0f;
+            } else {
+                obj3bt = 1.0f;
+            }
+            obj3.setUniform1f("backTest", obj3bt);
+            pressed = true;
+        }
+
+        if(!window.keyDown(GLFW_KEY_1) &&
+           !window.keyDown(GLFW_KEY_2) &&
+           !window.keyDown(GLFW_KEY_3)) {
+
+            pressed = false;
+
         }
 
         if(window.keyDown(GLFW_KEY_ESCAPE)) {
