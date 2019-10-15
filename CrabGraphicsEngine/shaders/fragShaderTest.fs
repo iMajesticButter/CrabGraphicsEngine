@@ -10,6 +10,7 @@ uniform float lightRange;
 uniform sampler2D tex;
 uniform sampler2D tex2;
 uniform float backTest;
+uniform vec3 tint;
 
 void main() {
 
@@ -21,10 +22,11 @@ void main() {
     vec4 tex1Col = texture(tex, uvCoord);
     vec4 col = tex1Col + (texture(tex2, uvCoord) * (1.0 - tex1Col.w)) * backTest;
 
-    if(col.a < 0.1f) {
-        discard;
-    }
+    //if(col.a < 0.1f) {
+    //    discard;
+    //}
 
     //color = (col/2 + vec4(VColor, 1.0)/30) * dist;
-    color = col * dist;
+    color.xyz = (col.xyz * tint) * dist;
+    color.w = col.w;
 }

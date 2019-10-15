@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "CrabWindow.h"
 #include "CrabShader.h"
 #include "CrabMaterial.h"
@@ -202,8 +203,13 @@ void InitOpenGL() {
 
     //return program;
 
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+}
+
+bool objSortFunc(CrabEngine::Graphics::GraphicsObject2D* obj1, CrabEngine::Graphics::GraphicsObject2D* obj2) {
+    return obj1->renderLayer < obj2->renderLayer;
 }
 
 int main() {
@@ -277,12 +283,13 @@ int main() {
 
     float obj1bt = 1.0f;
     float obj2bt = 1.0f;
-    float obj3bt = 1.0f;
+    float obj3bt = 0.5f;
 
     GraphicsObject2D obj1(&mesh, &testMat);
     obj1.setTexture("tex", &tex1);
     obj1.setTexture("tex2", &tex2);
     obj1.setUniform1f("backTest", obj1bt);
+    obj1.setUniform3f("tint", Vec3(1));
 
     objects.push_back(&obj1);
 
@@ -290,6 +297,8 @@ int main() {
     obj2.setTexture("tex", &tex1);
     obj2.setTexture("tex2", &tex2);
     obj2.setUniform1f("backTest", obj2bt);
+    obj2.setUniform3f("tint", Vec3(1));
+    obj2.renderLayer = -1;
 
     objects.push_back(&obj2);
 
@@ -297,8 +306,33 @@ int main() {
     obj3.setTexture("tex", &tex1);
     obj3.setTexture("tex2", &tex2);
     obj3.setUniform1f("backTest", obj3bt);
+    obj3.setUniform3f("tint", Vec3(1));
+    obj3.renderLayer = 1;
 
     objects.push_back(&obj3);
+
+    const int w = 20;
+    const int h = 20;
+
+    for(int x = 0; x < w; ++x) {
+        for(int y = 0; y < h; ++y) {
+
+            GraphicsObject2D* obj = new GraphicsObject2D(&mesh, &testMat);
+            obj->setTexture("tex", &tex1);
+            obj->setTexture("tex2", &tex2);
+            obj->setUniform1f("backTest", 1.0f);
+            obj->setUniform3f("tint", Vec3((float)x/w, (float)y/h, 1));
+
+            obj->renderLayer = -2;
+            obj->location = Vec3((x - ((float)x/2))/w, (y - ((float)y/2))/h, 0)*3;
+            obj->location.z = 10;
+            obj->rotation = 0;
+            obj->scale = Vec2(0.025f, 0.025f);
+
+            objects.push_back(obj);
+
+        }
+    }
 
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
@@ -337,11 +371,11 @@ int main() {
         obj1.scale = scale;
         obj1.rotation = rot;
 
-        obj2.location = pos + Vec3(2, 0, 3);
+        obj2.location = pos + Vec3(2, 0, 0);
         obj2.scale = scale;
         obj2.rotation = rot;
 
-        obj3.location = pos - Vec3(2, 0, 3);
+        obj3.location = pos - Vec3(2, 0, 0);
         obj3.scale = scale;
         obj3.rotation = rot;
 
@@ -364,6 +398,8 @@ int main() {
 
         //glBindVertexArray(VAO);
         //glUseProgram(program);
+
+        std::sort(objects.begin(), objects.end(), objSortFunc);
 
         vao->bind();
         for(unsigned i = 0; i < objects.size(); ++i) {
@@ -480,7 +516,7 @@ int main() {
 
         if(window.keyDown(GLFW_KEY_1) && !pressed) {
             if(obj1bt == 1.0f) {
-                obj1bt = 0.0f;
+                obj1bt = 0.5f;
             } else {
                 obj1bt = 1.0f;
             }
@@ -489,7 +525,7 @@ int main() {
         }
         if(window.keyDown(GLFW_KEY_2) && !pressed) {
             if(obj2bt == 1.0f) {
-                obj2bt = 0.0f;
+                obj2bt = 0.5f;
             } else {
                 obj2bt = 1.0f;
             }
@@ -498,7 +534,7 @@ int main() {
         }
         if(window.keyDown(GLFW_KEY_3) && !pressed) {
             if(obj3bt == 1.0f) {
-                obj3bt = 0.0f;
+                obj3bt = 0.5f;
             } else {
                 obj3bt = 1.0f;
             }

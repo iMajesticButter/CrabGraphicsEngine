@@ -55,6 +55,9 @@ namespace CrabEngine {
             //! rotation in radians
             float rotation;
 
+            //! larger = on top
+            int renderLayer = 0;
+
             GraphicsObject2D();
             GraphicsObject2D(Mesh* mesh, Material* mat);
 
