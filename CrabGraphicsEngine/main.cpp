@@ -17,6 +17,7 @@
 #include "CrabTexture.h"
 #include "CrabMesh.h"
 #include "CrabGraphicsObject2D.h"
+#include "CrabCamera.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -334,6 +335,12 @@ int main() {
         }
     }
 
+    Camera cam;
+
+    Vec2 camPos = Vec2(0,0);
+    float camRot = 0;
+    float camSize = 1;
+
     /*if(!glfwInit()) {
         std::cerr << "FAILED TO INITIALIZE GLFW!" << std::endl;
     }
@@ -379,6 +386,10 @@ int main() {
         obj3.scale = scale;
         obj3.rotation = rot;
 
+        cam.location = camPos;
+        cam.size = camSize;
+        cam.rotation = camRot;
+
         //testMat.setUniform1i("tex", 0);
         //testMat.setUniform1i("tex2", 1);
 
@@ -389,7 +400,7 @@ int main() {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         //create projection matrix
-        PerspectiveProjectionMatrix projMat(30.0f, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
+        PerspectiveProjectionMatrix projMat(cam.fov, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
 
         //draw triangle test
         //glEnableVertexAttribArray(0);
@@ -398,6 +409,8 @@ int main() {
 
         //glBindVertexArray(VAO);
         //glUseProgram(program);
+
+        Mat4 camMat = cam.getTansformationMatrix();
 
         std::sort(objects.begin(), objects.end(), objSortFunc);
 
@@ -416,7 +429,7 @@ int main() {
             ScaleMatrix scaleMat(objects[i]->scale);
             RotationMatrix2D rotMat(objects[i]->rotation);
             TranslationMatrix transMat(objects[i]->location);
-            Mat4 MVP = projMat * transMat * rotMat * scaleMat;
+            Mat4 MVP = projMat * camMat * transMat * rotMat * scaleMat;
 
             objects[i]->getMaterial()->setUniformMat4("MVP", MVP);
             //objects[i]->getMaterial()->setUniform1f("backTest", 0.5f);
@@ -512,6 +525,37 @@ int main() {
             if(lightRange < 0) {
                 lightRange = 0;
             }
+        }
+
+        if(window.keyDown(GLFW_KEY_I)) {
+            camPos.y += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_K)) {
+            camPos.y -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_J)) {
+            camPos.x -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_L)) {
+            camPos.x += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_U)) {
+            camRot -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_O)) {
+            camRot += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_Y)) {
+            camSize += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_H)) {
+            camSize -= 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_T)) {
+            cam.fov += 0.01;
+        }
+        if(window.keyDown(GLFW_KEY_G)) {
+            cam.fov -= 0.01;
         }
 
         if(window.keyDown(GLFW_KEY_1) && !pressed) {
