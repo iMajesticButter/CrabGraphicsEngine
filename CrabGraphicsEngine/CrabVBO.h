@@ -55,6 +55,7 @@ namespace CrabEngine {
             void releasePointer();
             void bind();
             void unbind();
+            unsigned getSize();
 
         private:
             VBOusage m_usage;

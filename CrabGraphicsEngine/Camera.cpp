@@ -4,7 +4,7 @@
 namespace CrabEngine {
     namespace Graphics {
 
-        Camera::Camera() : location(0,0), rotation(0), fov(30.0f), size(1), active(true), renderlayer(0), m_viewport(0,0,1,1) {
+        Camera::Camera() : location(0,0), rotation(0), fov(30.0f), size(1), active(true), renderLayer(0), m_viewport(0,0,1,1) {
 
         }
 
@@ -15,7 +15,7 @@ namespace CrabEngine {
             float scale = 1/size;
             ScaleMatrix scaleMat(Vec2(scale, scale));
             RotationMatrix2D rotMat(-rotation);
-            TranslationMatrix transMat(Vec4(-location, 0.0f, 1.0f));
+            TranslationMatrix transMat(Vec4(-location, 10.0f, 1.0f));
             return transMat * rotMat * scaleMat;;
         }
 

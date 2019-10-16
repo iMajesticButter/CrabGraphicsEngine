@@ -22,7 +22,7 @@ namespace CrabEngine {
             bool active;
 
             //! larger = on top
-            int renderlayer;
+            int renderLayer;
 
             Camera();
 

@@ -1,6 +1,5 @@
 #include "CrabMaterial.h"
 
-
 namespace CrabEngine {
     namespace Graphics {
 
@@ -58,8 +57,6 @@ namespace CrabEngine {
         }
 
         void Material::Initialize() {
-            m_initialized = true;
-
             //error vars
             GLint Result = GL_FALSE;
             int InfoLogLength;
@@ -121,6 +118,9 @@ namespace CrabEngine {
                 glDetachShader(m_program, shaders[i]);
                 glDeleteShader(shaders[i]);
             }
+
+            m_initialized = true;
+
         }
 
         bool Material::isInitialized() {

@@ -16,7 +16,7 @@ namespace CrabEngine {
             void bind();
             void unbind();
 
-            void draw(unsigned count);
+            void draw(unsigned count, unsigned offset = 0);
 
         private:
             GLuint m_vao;

@@ -59,10 +59,10 @@ namespace CrabEngine {
         //---------------------------------------------
 
 
-        GraphicsObject2D::GraphicsObject2D() : m_material(nullptr), m_mesh(nullptr) {
+        GraphicsObject2D::GraphicsObject2D() : location(0,0,0), scale(1,1), rotation(0), visible(true), m_material(nullptr), m_mesh(nullptr) {
 
         }
-        GraphicsObject2D::GraphicsObject2D(Mesh* mesh, Material* mat) : m_material(mat), m_mesh(mesh) {
+        GraphicsObject2D::GraphicsObject2D(Mesh* mesh, Material* mat) : location(0,0,0), scale(1,1), rotation(0), visible(true), m_material(mat), m_mesh(mesh) {
 
         }
 

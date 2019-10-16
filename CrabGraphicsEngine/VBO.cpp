@@ -36,7 +36,7 @@ namespace CrabEngine {
         // VBO
         //---------------------------------
 
-        VBO::VBO(VBOusage usage) : m_usage(usage) {
+        VBO::VBO(VBOusage usage) : m_usage(usage), m_size(0) {
             glCreateBuffers(1, &m_vbo);
         }
         VBO::~VBO() {
@@ -58,6 +58,8 @@ namespace CrabEngine {
             }
         }
         void VBO::setData(const unsigned size, const void* data) {
+            m_size = size;
+
             glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
             glBufferData(GL_ARRAY_BUFFER, size, data, m_usage == VBOusage::DYNAMIC ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
@@ -73,6 +75,10 @@ namespace CrabEngine {
         }
         void VBO::unbind() {
             glBindBuffer(GL_ARRAY_BUFFER, 0);
+        }
+
+        unsigned VBO::getSize() {
+            return m_size;
         }
     }
 }

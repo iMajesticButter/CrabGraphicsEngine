@@ -58,6 +58,8 @@ namespace CrabEngine {
             //! larger = on top
             int renderLayer = 0;
 
+            bool visible;
+
             GraphicsObject2D();
             GraphicsObject2D(Mesh* mesh, Material* mat);
 

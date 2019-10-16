@@ -17,8 +17,8 @@ namespace CrabEngine {
             glBindVertexArray(0);
         }
 
-        void VAO::draw(unsigned count) {
-            glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL);
+        void VAO::draw(unsigned count, unsigned offset) {
+            glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)offset);
         }
     }
 }

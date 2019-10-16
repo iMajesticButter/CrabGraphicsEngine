@@ -397,7 +397,7 @@ int main() {
 
         glViewport(0, 0, window.fbWidth(), window.fbHeight());
         glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
 
         //create projection matrix
         PerspectiveProjectionMatrix projMat(cam.fov, window.fbWidth(), window.fbHeight(), 1.0f, 1000.0f);
@@ -446,7 +446,7 @@ int main() {
             //vbo->bindAttributeLocations(testMat);
             //glDrawArrays(GL_TRIANGLES, 0, 6);
             vao->draw(objects[i]->getMesh()->triangles.size());
-            testMat.unbind();
+            //testMat.unbind();
         }
         ibo->unbind();
         vao->unbind();
@@ -552,10 +552,10 @@ int main() {
             camSize -= 0.01;
         }
         if(window.keyDown(GLFW_KEY_T)) {
-            cam.fov += 0.01;
+            cam.fov += 0.1;
         }
         if(window.keyDown(GLFW_KEY_G)) {
-            cam.fov -= 0.01;
+            cam.fov -= 0.1;
         }
 
         if(window.keyDown(GLFW_KEY_1) && !pressed) {
