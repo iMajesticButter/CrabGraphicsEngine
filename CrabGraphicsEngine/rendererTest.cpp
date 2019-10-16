@@ -127,8 +127,14 @@ int main() {
 
 
     Camera cam;
+    Camera cam2;
+    cam2.renderLayer = 1;
+    cam2.setViewportPos(0, 0, 0.25, 0.25);
 
     Renderer2D renderer(&window);
+
+    bool fullscreen = false;
+    bool pressed = false;
 
     while(!window.shouldClose()) {
 
@@ -145,6 +151,7 @@ int main() {
             renderer.pushObject(objects[i]);
         }
         renderer.pushCamera(&cam);
+        renderer.pushCamera(&cam2);
 
         renderer.end();
 
@@ -159,6 +166,16 @@ int main() {
         }
         if(window.keyDown(GLFW_KEY_D)) {
             PlayerPos.x += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_F11)) {
+            if(!pressed) {
+                fullscreen = !fullscreen;
+                window.setFullscreen(fullscreen);
+                window.initialize();
+            }
+            pressed = true;
+        } else {
+            pressed = false;
         }
 
     }

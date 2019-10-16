@@ -209,17 +209,18 @@ namespace CrabEngine{
             //--------------------------------------------------------------
 
             m_window->update();
+            
+            glClear(GL_COLOR_BUFFER_BIT);
 
             for(unsigned c = 0; c < m_cams.size(); ++c) {
                 Camera* cam = m_cams[c];
 
-                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, m_window->fbWidth(), m_window->fbHeight(), 1.0f, 1000.0f);
+                Vec4 viewport = cam->getViewportAsVec4();
+
+                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight(), 1.0f, 1000.0f);
                 Mat4 viewMatrix = cam->getTansformationMatrix();
 
-
-                Vec4 viewport = cam->getViewportAsVec4();
                 glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
-                glClear(GL_COLOR_BUFFER_BIT);
 
                 unsigned indexOffset = 0;
 
