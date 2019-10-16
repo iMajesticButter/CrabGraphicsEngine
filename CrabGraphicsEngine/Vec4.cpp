@@ -273,6 +273,13 @@ namespace CrabEngine {
             setHSV(hsv);
         }
 
+        Color& Color::operator=(const Color& other) {
+            red = other.red;
+            green = other.green;
+            blue = other.blue;
+            return *this;
+        }
+
         hsv Color::getHSV() const {
             hsv hcol;
 

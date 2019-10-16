@@ -4,7 +4,7 @@
 namespace CrabEngine {
     namespace Graphics {
 
-        Camera::Camera() : location(0,0), rotation(0), fov(30.0f), size(1), active(true), renderLayer(0), m_viewport(0,0,1,1) {
+        Camera::Camera() : location(0,0), rotation(0), fov(30.0f), size(1), active(true), clearColor(0,0,0,255), renderLayer(0), m_viewport(0,0,1,1) {
 
         }
 

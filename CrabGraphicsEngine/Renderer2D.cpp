@@ -191,10 +191,14 @@ namespace CrabEngine{
             //test------------------------------------
             vboDataIterator = nullptr;
 
+            //std::cout << "SETTING IBO DATA: " << m_numIndecies * sizeof(unsigned) << std::endl;
             //push ibodata to ibo
-            m_ibo->setData(sizeof(unsigned) * m_numIndecies, iboData);
+            m_ibo->setData(m_numIndecies, iboData);
+            //std::cout << "DONE SETTING IBO DATA" << std::endl;
+            //std::cout << "SETTING VBO DATA" << std::endl;
             //test--------------------------
             m_vbo->setData(sizeof(GLfloat) * (m_numVertecies*4), vboData);
+            //std::cout << "DONE SETTING VBO DATA" << std::endl;
 
             delete[] iboData;
             //test-----------------------------
@@ -208,8 +212,10 @@ namespace CrabEngine{
             // draw
             //--------------------------------------------------------------
 
+            //std::cout << "SWAPPING BUFFERS" << std::endl;
             m_window->update();
-            
+            //std::cout << "DONE SWAPPING BUFFERS" << std::endl;
+
             glClear(GL_COLOR_BUFFER_BIT);
 
             for(unsigned c = 0; c < m_cams.size(); ++c) {

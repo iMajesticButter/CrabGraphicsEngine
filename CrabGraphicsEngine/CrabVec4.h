@@ -90,6 +90,8 @@ namespace CrabEngine {
             Color(float v = 255);
             Color(const hsv& hsv, float alpha = 255);
 
+            Color& operator=(const Color& other);
+
             hsv getHSV() const;
             void setHSV(const hsv& hcol);
         };

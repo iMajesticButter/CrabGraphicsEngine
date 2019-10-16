@@ -94,8 +94,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 30;
-    const int h = 30;
+    const int w = 10;
+    const int h = 10;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -107,11 +107,11 @@ int main() {
             obj->setUniform3f("tint", Vec3((float)x/w, (float)y/h, 1));
 
             obj->renderLayer = -2;
-            obj->location = Vec3(x * 0.025f,
-                                 y * 0.025f, -3);
+            obj->location = Vec3(x * 0.2f,
+                                 y * 0.2f, -3);
             obj->location.z = 10;
             obj->rotation = 0;
-            obj->scale = Vec2(0.025f, 0.025f);
+            obj->scale = Vec2(0.1f, 0.1f);
 
             objects.push_back(obj);
 
@@ -119,14 +119,11 @@ int main() {
     }
 
 
-
-
-
-
     Vec2 PlayerPos(0,0);
 
 
     Camera cam;
+    cam.clearColor = Color(100, 100, 100, 255);
     Camera cam2;
     cam2.renderLayer = 1;
     cam2.setViewportPos(0, 0, 0.25, 0.25);

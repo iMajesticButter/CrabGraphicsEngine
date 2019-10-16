@@ -21,6 +21,8 @@ namespace CrabEngine {
             float size;
             bool active;
 
+            CrabEngine::Math::Color clearColor;
+
             //! larger = on top
             int renderLayer;
 
