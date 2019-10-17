@@ -34,11 +34,20 @@ namespace CrabEngine {
             void setWrapMode(texWrapMode mode);
             void setFilteringMode(texFilterMode mode);
 
+            void setWidth(unsigned width);
+            void setHeight(unsigned height);
+
+            GLuint getTextureID();
+
             void bind(unsigned index);
 
             void Init();
 
+            void Resize();
+
             bool m_generated;
+
+            friend void TextureInitEvent(void* context);
 
         private:
             std::vector<unsigned char> m_data;

@@ -1,6 +1,7 @@
 #include "CrabShader.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 namespace CrabEngine {
     namespace Graphics {
@@ -19,9 +20,15 @@ namespace CrabEngine {
             //get shader source from file
             std::fstream file;
             file.open(path);
+            if(!file) {
+                std::cout << "Shader File: " << path << " Does Not Exist!!" << std::endl;
+                m_shaderSource = "";
+                return;
+            }
             std::stringstream sstr;
             sstr << file.rdbuf();
             m_shaderSource = sstr.str();
+            file.close();
         }
 
         Shader::Shader(const Shader& shader) {

@@ -78,6 +78,7 @@ namespace CrabEngine {
             	if ( InfoLogLength > 0 ){
             		std::vector<char> ShaderErrorMessage(InfoLogLength+1);
             		glGetShaderInfoLog(shaders[i], InfoLogLength, NULL, &ShaderErrorMessage[0]);
+                    printf("Shader Error:\n");
             		printf("%s\n", &ShaderErrorMessage[0]);
                     printf("Source: %s\n", src);
             	}
@@ -110,7 +111,9 @@ namespace CrabEngine {
         	if ( InfoLogLength > 0 ){
         		std::vector<char> ProgramErrorMessage(InfoLogLength+1);
         		glGetProgramInfoLog(m_program, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+                printf("Shader Program Error:\n");
         		printf("%s\n", &ProgramErrorMessage[0]);
+                printf("Source: %s\n", m_name.c_str());
         	}
 
             //detach and delete shaders

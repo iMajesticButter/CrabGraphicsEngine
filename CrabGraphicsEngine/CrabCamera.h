@@ -4,6 +4,9 @@
 #include "CrabVec2.h"
 #include "CrabVec4.h"
 #include "CrabMat4.h"
+#include "CrabPostEffect.h"
+
+#include <vector>
 
 namespace CrabEngine {
     namespace Graphics {
@@ -21,7 +24,7 @@ namespace CrabEngine {
             float size;
             bool active;
 
-            CrabEngine::Math::Color clearColor;
+            CrabEngine::Math::Vec4 clearColor;
 
             //! larger = on top
             int renderLayer;
@@ -45,9 +48,16 @@ namespace CrabEngine {
             */
             CrabEngine::Math::Vec4 getViewportAsVec4();
 
+            void addPostEffect(PostEffect* effect);
+            std::vector<PostEffect*> getPostEffects();
+            void removePostEffect(unsigned index);
+            void removePostEffect(PostEffect* effect);
+
         private:
 
             CrabEngine::Math::Vec4 m_viewport;
+
+            std::vector<PostEffect*> m_postEffects;
 
         };
 

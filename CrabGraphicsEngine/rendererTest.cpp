@@ -8,6 +8,7 @@
 #include "CrabVec4.h"
 #include "CrabCamera.h"
 #include "CrabWindow.h"
+#include "CrabPostEffect.h"
 
 #include <vector>
 
@@ -30,6 +31,16 @@ int main() {
     material2.AddShader(vertShader);
     material2.AddShader(fragShader2);
     material2.Initialize();
+
+    VertexShader postVert("./shaders/postEffectTest.vs");
+    FragmentShader postFrag("./shaders/postEffectTest.fs");
+
+    Material postEffectMat(window, "Post Effect Test");
+    postEffectMat.AddShader(postVert);
+    postEffectMat.AddShader(postFrag);
+    postEffectMat.Initialize();
+
+    PostEffect postEffectTest(&postEffectMat);
 
     Texture mrKrabs(window);
     mrKrabs.loadBitmap("textures/crab.bmp");
@@ -123,10 +134,12 @@ int main() {
 
 
     Camera cam;
-    cam.clearColor = Color(100, 100, 100, 255);
+    cam.clearColor = Vec4(10, 10, 10, 255);
+    cam.addPostEffect(&postEffectTest);
     Camera cam2;
+    cam2.clearColor = Vec4(30, 30, 30, 255);
     cam2.renderLayer = 1;
-    cam2.setViewportPos(0, 0, 0.25, 0.25);
+    cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
 
     Renderer2D renderer(&window);
 

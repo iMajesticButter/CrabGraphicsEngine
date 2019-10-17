@@ -1,4 +1,4 @@
-#include "GLEW/glew.h"
+//#include "GLEW/glew.h"
 
 #include "CrabRenderer2D.h"
 #include "CrabGraphicsObject2D.h"
@@ -36,11 +36,23 @@ namespace CrabEngine{
         // Renderer 2D
         //-------------------------------------------------------
 
-        Renderer2D::Renderer2D(Window* window) : m_window(window) {
+        Renderer2D::Renderer2D(Window* window) : m_window(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
+                m_screenSpaceImageFrag("./internalShaders/screenSpaceImage.fs"),
+                m_screenSpaceImageVert("./internalShaders/screenSpaceImage.vs"),
+                m_fbo(window),
+                m_tex0(*window),
+                m_tex1(*window) {
             windowInitEventCallback callback;
             callback.context = this;
             callback.func = InitCallback;
             m_window->registerInitFunc(callback);
+
+            m_screenSpaceImageMat.AddShader(m_screenSpaceImageFrag);
+            m_screenSpaceImageMat.AddShader(m_screenSpaceImageVert);
+            m_screenSpaceImageMat.Initialize();
+
+            m_tex0.setFilteringMode(LINEAR);
+            m_tex1.setFilteringMode(LINEAR);
 
             Init();
         }
@@ -55,6 +67,15 @@ namespace CrabEngine{
 
             if(m_ibo != nullptr)
                 delete m_ibo;
+
+            if(m_vboQuad != nullptr)
+                delete m_vboQuad;
+
+            if(m_vaoQuad != nullptr)
+                delete m_vaoQuad;
+
+            if(m_iboQuad != nullptr)
+                delete m_iboQuad;
         }
 
         void Renderer2D::Init() {
@@ -71,9 +92,9 @@ namespace CrabEngine{
             //create vao vbo and ibo
             m_vao = new VAO();
             m_vao->bind();
-            m_vbo = new VBO(VBOusage::STATIC);
+            m_vbo = new VBO(VBOusage::DYNAMIC);
             m_vbo->bind();
-            m_ibo = new IBO(VBOusage::STATIC);
+            m_ibo = new IBO(VBOusage::DYNAMIC);
 
             //set vbo layout
             VBOlayout layout;
@@ -84,10 +105,74 @@ namespace CrabEngine{
 
             m_vao->unbind();
 
+            //create quad
+            if(m_vboQuad != nullptr)
+                delete m_vboQuad;
+
+            if(m_vaoQuad != nullptr)
+                delete m_vaoQuad;
+
+            if(m_iboQuad != nullptr)
+                delete m_iboQuad;
+
+            //create quad vao vbo and ibo
+            m_vaoQuad = new VAO();
+            m_vaoQuad->bind();
+            m_vboQuad = new VBO(VBOusage::STATIC);
+            m_vboQuad->bind();
+            m_iboQuad = new IBO(VBOusage::STATIC);
+
+            //set quad vbo layout
+            m_vboQuad->setLayout(layout);
+
+            //set quad vertecies and indices
+            const float quadVertecies[] {
+              //  x      y               s     t
+                 1.0f,  1.0f,           1.0f, 1.0f,
+                 1.0f, -1.0f,           1.0f, 0.0f,
+                -1.0f, -1.0f,           0.0f, 0.0f,
+                -1.0f,  1.0f,           0.0f, 1.0f
+            };
+            const unsigned quadIndices[] {
+                0, 1, 2,
+                0, 3, 2
+            };
+
+            m_vboQuad->setData(sizeof(float) * 16, quadVertecies);
+            m_iboQuad->setData(sizeof(unsigned) * 6, quadIndices);
+
+            m_vaoQuad->unbind();
+
             //enable blending
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
+
+
+        void Renderer2D::drawScreenSpaceTexture(Texture* tex, float x, float y, float width, float height, float alpha) {
+            drawScreenSpaceTexture(tex, CrabEngine::Math::Vec4(x,y,width,height), alpha);
+        }
+        void Renderer2D::drawScreenSpaceTexture(Texture* tex, CrabEngine::Math::Vec4 viewport, float alpha) {
+
+            glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
+
+            m_screenSpaceImageMat.setUniform4f("viewport", viewport);
+            m_screenSpaceImageMat.setUniform1f("alpha", alpha);
+
+            tex->bind(0);
+
+            m_screenSpaceImageMat.setUniform1i("tex", 0);
+
+            m_vaoQuad->bind();
+            m_iboQuad->bind();
+            m_screenSpaceImageMat.bind();
+            m_vaoQuad->draw(6);
+            m_screenSpaceImageMat.unbind();
+            m_iboQuad->unbind();
+            m_vaoQuad->unbind();
+
+        }
+
 
         void Renderer2D::start() {
             if(m_active) {
@@ -144,18 +229,11 @@ namespace CrabEngine{
 
             //build the vbo and ibo
             m_vao->bind();
-            const unsigned vertexSize = sizeof(GLfloat)*4;
-
-            //resize vbo if required
-            if(m_numVertecies * vertexSize != m_vbo->getSize()) {
-                //m_vbo->resize(m_numVertecies * vertexSize);
-            }
 
             //set vbo and ibo data
             unsigned* iboData = new unsigned[m_numIndecies];
             unsigned* iboDataIterator = iboData;
 
-            //test-------------------------
             float* vboData = new float[m_numVertecies*4];
             float* vboDataIterator = vboData;
 
@@ -163,45 +241,29 @@ namespace CrabEngine{
 
             unsigned offset = 0;
 
-            //byte* vboPtr = (byte*)m_vbo->getPointerInternal();
             for(unsigned i = 0; i < m_objects.size(); ++i) {
                 //copy data to vbo
                 data = m_objects[i]->getMesh()->getVertexData();
 
-                //unsigned size = sizeof(GLfloat) * data.size();
-
-                //memcpy(vboPtr, &data.front(), size);
-                //vboPtr += size;
-
                 //copy data to ibo
-                //memcpy(iboDataIterator, &(m_objects[i]->getMesh()->triangles.front()), sizeof(unsigned) * m_objects[i]->getMesh()->triangles.size());
                 for(unsigned j = 0; j < m_objects[i]->getMesh()->triangles.size(); ++j) {
                     *(iboDataIterator + j) = m_objects[i]->getMesh()->triangles[j] + offset;
                 }
                 iboDataIterator += m_objects[i]->getMesh()->triangles.size();
                 offset += m_objects[i]->getMesh()->vertecies.size();
 
-                //test---------------------------------
+                //copy data to vbo
                 memcpy(vboDataIterator, &data.front(), sizeof(GLfloat) * data.size());
                 vboDataIterator += data.size();
             }
-            //m_vbo->releasePointer();
-            //vboPtr = nullptr;
             iboDataIterator = nullptr;
-            //test------------------------------------
             vboDataIterator = nullptr;
 
-            //std::cout << "SETTING IBO DATA: " << m_numIndecies * sizeof(unsigned) << std::endl;
-            //push ibodata to ibo
+            //push ibodata to ibo and vbo
             m_ibo->setData(m_numIndecies, iboData);
-            //std::cout << "DONE SETTING IBO DATA" << std::endl;
-            //std::cout << "SETTING VBO DATA" << std::endl;
-            //test--------------------------
             m_vbo->setData(sizeof(GLfloat) * (m_numVertecies*4), vboData);
-            //std::cout << "DONE SETTING VBO DATA" << std::endl;
 
             delete[] iboData;
-            //test-----------------------------
             delete[] vboData;
 
 
@@ -212,25 +274,42 @@ namespace CrabEngine{
             // draw
             //--------------------------------------------------------------
 
-            //std::cout << "SWAPPING BUFFERS" << std::endl;
-            m_window->update();
-            //std::cout << "DONE SWAPPING BUFFERS" << std::endl;
-
-            glClear(GL_COLOR_BUFFER_BIT);
-
+            m_ibo->bind();
             for(unsigned c = 0; c < m_cams.size(); ++c) {
                 Camera* cam = m_cams[c];
 
                 Vec4 viewport = cam->getViewportAsVec4();
 
+
+                //set up frame buffer and textures
+                m_tex0.setWidth(viewport.z * m_window->fbWidth());
+                m_tex0.setHeight(viewport.w * m_window->fbHeight());
+                m_tex0.Resize();
+                m_tex1.setWidth(viewport.z * m_window->fbWidth());
+                m_tex1.setHeight(viewport.w * m_window->fbHeight());
+                m_tex1.Resize();
+                m_fbo.resize(viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
+
+                Texture* activeTexture = &m_tex0;
+
+                m_fbo.bind();
+
+                m_fbo.setTexture(&m_tex0);
+
+                glClearColor(cam->clearColor.x/255, cam->clearColor.y/255, cam->clearColor.z/255, cam->clearColor.w/255);
+                glClear(GL_COLOR_BUFFER_BIT);
+
+
+
                 Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight(), 1.0f, 1000.0f);
                 Mat4 viewMatrix = cam->getTansformationMatrix();
 
-                glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
+                //glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
+                glViewport(0, 0, viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
 
                 unsigned indexOffset = 0;
 
-                m_ibo->bind();
+
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
                     GraphicsObject2D* obj = m_objects[o];
 
@@ -259,14 +338,32 @@ namespace CrabEngine{
                     obj->getMaterial()->unbind();
                 }
                 //glUseProgram(0);
-                m_ibo->unbind();
 
+                //TODO: do post processing effects
+
+
+
+                m_fbo.unbind();
+
+                m_ibo->unbind();
+                m_vao->unbind();
+
+                drawScreenSpaceTexture(activeTexture, viewport, cam->clearColor.w/255);
+
+                m_vao->bind();
+                m_ibo->bind();
             }
+            m_ibo->unbind();
 
             m_vao->unbind();
 
             m_objects.clear();
             m_cams.clear();
+
+            m_window->update();
+
+            glClearColor(0,0,0,1);
+            glClear(GL_COLOR_BUFFER_BIT);
 
         }
     }

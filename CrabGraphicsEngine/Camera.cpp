@@ -29,5 +29,25 @@ namespace CrabEngine {
             return m_viewport;
         }
 
+
+        void Camera::addPostEffect(PostEffect* effect) {
+            m_postEffects.push_back(effect);
+        }
+        std::vector<PostEffect*> Camera::getPostEffects() {
+            return m_postEffects;
+        }
+        void Camera::removePostEffect(unsigned index) {
+            if(index < m_postEffects.size()) {
+                m_postEffects.erase(m_postEffects.begin()+index);
+            }
+        }
+        void Camera::removePostEffect(PostEffect* effect) {
+            for(unsigned i = 0; i < m_postEffects.size(); ++i) {
+                if(m_postEffects[i] == effect) {
+                    removePostEffect(i);
+                    return;
+                }
+            }
+        }
     }
 }
