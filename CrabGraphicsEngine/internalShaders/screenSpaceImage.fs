@@ -16,5 +16,5 @@ void main() {
     //if(texColor.w < 0.1)
     //    discard;
     fragColor.xyz = texColor.xyz;
-    fragColor.w = clamp(texColor.w, 0, 1);
+    fragColor.w = clamp(texColor.w, alpha, 1);
 }
