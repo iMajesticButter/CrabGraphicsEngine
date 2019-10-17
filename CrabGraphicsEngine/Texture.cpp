@@ -55,6 +55,19 @@ namespace CrabEngine {
         void Texture::setHeight(unsigned height) {
             m_height = height;
         }
+        void Texture::setFormat(GLenum format) {
+            m_format = format;
+        }
+
+        unsigned Texture::getWidth() {
+            return m_width;
+        }
+        unsigned Texture::getHeight() {
+            return m_height;
+        }
+        GLenum Texture::getFormat() {
+            return m_format;
+        }
 
         GLuint Texture::getTextureID() {
             return m_texture;

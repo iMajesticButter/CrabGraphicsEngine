@@ -36,6 +36,11 @@ namespace CrabEngine {
 
             void setWidth(unsigned width);
             void setHeight(unsigned height);
+            void setFormat(GLenum format);
+
+            unsigned getWidth();
+            unsigned getHeight();
+            GLenum getFormat();
 
             GLuint getTextureID();
 

@@ -57,6 +57,11 @@ int main() {
     sponge.setFilteringMode(LINEAR);
     sponge.Init();
 
+    Texture scene(window);
+    scene.setWidth(1000);
+    scene.setHeight(1000);
+    scene.Init();
+
     Mesh quad;
 
     std::vector<Vec2> quadVertecies {
@@ -157,6 +162,18 @@ int main() {
 
         material.setUniform2f("mousePos", window.cursorX(), -(window.cursorY()-window.fbHeight()));
         material.setUniform1f("lightRange", 10.0f);
+
+        renderer.start();
+
+        for(unsigned i = 0; i < objects.size(); ++i) {
+            renderer.pushObject(objects[i]);
+        }
+        renderer.pushCamera(&cam);
+        renderer.pushCamera(&cam2);
+
+        renderer.end(&scene);
+
+        player.setTexture("tex", &scene);
 
         renderer.start();
 

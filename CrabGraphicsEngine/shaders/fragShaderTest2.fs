@@ -9,8 +9,8 @@ uniform sampler2D tex;
 uniform vec3 tint;
 
 void main() {
-
-    color.xyz = texture(tex, uvCoord).xyz * tint;
-    color.w = 0.5;
+    vec4 texCol = texture(tex, uvCoord);
+    color.xyz = texCol.xyz * tint;
+    color.w = texCol.w;
 
 }

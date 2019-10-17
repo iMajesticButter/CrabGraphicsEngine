@@ -155,9 +155,13 @@ namespace CrabEngine{
         void Renderer2D::drawScreenSpaceTexture(Texture* tex, float x, float y, float width, float height, float alpha) {
             drawScreenSpaceTexture(tex, CrabEngine::Math::Vec4(x,y,width,height), alpha);
         }
-        void Renderer2D::drawScreenSpaceTexture(Texture* tex, CrabEngine::Math::Vec4 viewport, float alpha) {
+        void Renderer2D::drawScreenSpaceTexture(Texture* tex, CrabEngine::Math::Vec4 viewport, float alpha, unsigned fbWidth, unsigned fbHeight) {
+            if(fbWidth == 0)
+                fbWidth = m_window->fbWidth();
+            if(fbHeight == 0)
+                fbHeight = m_window->fbHeight();
 
-            glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
+            glViewport(0, 0, fbWidth, fbHeight);
 
             m_screenSpaceImageMat.setUniform4f("viewport", viewport);
             m_screenSpaceImageMat.setUniform1f("alpha", alpha);
@@ -217,7 +221,7 @@ namespace CrabEngine{
         }
 
 
-        void Renderer2D::end() {
+        void Renderer2D::end(Texture* outputTexture) {
             if(!m_active) {
                 std::cerr << "Renderer is not active!, call Renderer2D::start()" << std::endl;
                 return;
@@ -277,6 +281,35 @@ namespace CrabEngine{
             // draw
             //--------------------------------------------------------------
 
+            //setup output texture
+            unsigned fbWidth = m_window->fbWidth();
+            unsigned fbHeight = m_window->fbHeight();
+
+            bool outTex = false;
+            if(outputTexture != nullptr) {
+                outTex = true;
+
+                fbWidth  = outputTexture->getWidth();
+                fbHeight = outputTexture->getHeight();
+
+                fbWidth  = fbWidth  == 0 ? 1 : fbWidth;
+                fbHeight = fbHeight == 0 ? 1 : fbHeight;
+
+                outputTexture->setFormat(GL_RGBA);
+                outputTexture->Resize();
+
+                m_fbo.resize(fbWidth, fbHeight);
+
+                m_fbo.bind();
+
+                m_fbo.setTexture(outputTexture);
+                glClearColor(0,0,0,1);
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                m_fbo.unbind();
+
+            }
+
             std::chrono::duration<double> time = std::chrono::steady_clock::now() - m_startTime;
             m_time = time.count();
 
@@ -288,13 +321,13 @@ namespace CrabEngine{
 
 
                 //set up frame buffer and textures
-                m_tex0.setWidth(viewport.z * m_window->fbWidth());
-                m_tex0.setHeight(viewport.w * m_window->fbHeight());
+                m_tex0.setWidth(viewport.z * fbWidth);
+                m_tex0.setHeight(viewport.w * fbHeight);
                 m_tex0.Resize();
-                m_tex1.setWidth(viewport.z * m_window->fbWidth());
-                m_tex1.setHeight(viewport.w * m_window->fbHeight());
+                m_tex1.setWidth(viewport.z * fbWidth);
+                m_tex1.setHeight(viewport.w * fbHeight);
                 m_tex1.Resize();
-                m_fbo.resize(viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
+                m_fbo.resize(viewport.z * fbWidth, viewport.w * fbHeight);
 
                 Texture* activeTexture = &m_tex0;
 
@@ -307,11 +340,11 @@ namespace CrabEngine{
 
 
 
-                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight(), 1.0f, 1000.0f);
+                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * fbWidth, viewport.w * fbHeight, 1.0f, 1000.0f);
                 Mat4 viewMatrix = cam->getTansformationMatrix();
 
                 //glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
-                glViewport(0, 0, viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
+                glViewport(0, 0, viewport.z * fbWidth, viewport.w * fbHeight);
 
                 unsigned indexOffset = 0;
 
@@ -375,11 +408,22 @@ namespace CrabEngine{
                 lastTexture = nullptr;
 
                 //finally, draw to screen!
-                m_fbo.unbind();
+                if(outTex) {
+                    m_fbo.unbind();
+                    m_fbo.resize(fbWidth, fbHeight);
+                    m_fbo.bind();
+                    m_fbo.setTexture(outputTexture);
+                } else {
+                    m_fbo.unbind();
+                }
 
-                glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
-                drawScreenSpaceTexture(activeTexture, viewport, cam->clearColor.w/255);
+                glViewport(0, 0, fbWidth, fbHeight);
+                drawScreenSpaceTexture(activeTexture, viewport, cam->clearColor.w/255, fbWidth, fbHeight);
                 activeTexture = nullptr;
+
+                if(outTex) {
+                    m_fbo.unbind();
+                }
 
                 //re-bind vao and ibo for next camera
                 m_vao->bind();
@@ -392,10 +436,12 @@ namespace CrabEngine{
             m_objects.clear();
             m_cams.clear();
 
-            m_window->update();
+            if(!outTex) {
+                m_window->update();
 
-            glClearColor(0,0,0,1);
-            glClear(GL_COLOR_BUFFER_BIT);
+                glClearColor(0,0,0,1);
+                glClear(GL_COLOR_BUFFER_BIT);
+            }
 
         }
 

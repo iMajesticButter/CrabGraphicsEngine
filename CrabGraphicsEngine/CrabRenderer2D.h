@@ -33,12 +33,12 @@ namespace CrabEngine {
             void Init();
 
             void drawScreenSpaceTexture(Texture* tex, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f, float alpha = 1.0f);
-            void drawScreenSpaceTexture(Texture* tex, CrabEngine::Math::Vec4 viewport, float alpha = 1.0f);
+            void drawScreenSpaceTexture(Texture* tex, CrabEngine::Math::Vec4 viewport, float alpha = 1.0f, unsigned fbWidth = 0, unsigned fbHeight = 0);
 
             void start();
             void pushCamera(Camera* cam);
             void pushObject(GraphicsObject2D* obj);
-            void end();
+            void end(Texture* outputTexture = nullptr);
 
         private:
 
