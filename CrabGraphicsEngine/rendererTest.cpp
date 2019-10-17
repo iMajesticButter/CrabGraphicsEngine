@@ -135,10 +135,13 @@ int main() {
 
     Camera cam;
     cam.clearColor = Vec4(10, 10, 10, 255);
-    cam.addPostEffect(&postEffectTest);
+    //cam.addPostEffect(&postEffectTest);
+    //cam.addPostEffect(&postEffectTest);
+    //cam.addPostEffect(&postEffectTest);
     Camera cam2;
     cam2.clearColor = Vec4(30, 30, 30, 255);
     cam2.renderLayer = 1;
+    cam2.addPostEffect(&postEffectTest);
     cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
 
     Renderer2D renderer(&window);

@@ -9,6 +9,7 @@
 #include "CrabTexture.h"
 
 #include <vector>
+#include <chrono>
 
 #define byte unsigned char
 
@@ -41,6 +42,8 @@ namespace CrabEngine {
 
         private:
 
+            void drawPostEffectQuad(Texture* tex, Material* mat);
+
             Window* m_window;
 
             std::vector<GraphicsObject2D*> m_objects;
@@ -66,6 +69,9 @@ namespace CrabEngine {
             FrameBuffer m_fbo;
             Texture m_tex0;
             Texture m_tex1;
+
+            float m_time;
+            std::chrono::time_point<std::chrono::steady_clock> m_startTime;
 
         };
     }

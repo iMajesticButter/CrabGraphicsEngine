@@ -54,6 +54,9 @@ namespace CrabEngine{
             m_tex0.setFilteringMode(LINEAR);
             m_tex1.setFilteringMode(LINEAR);
 
+            //set start time
+            m_startTime = std::chrono::steady_clock::now();
+
             Init();
         }
         Renderer2D::~Renderer2D() {
@@ -274,6 +277,9 @@ namespace CrabEngine{
             // draw
             //--------------------------------------------------------------
 
+            std::chrono::duration<double> time = std::chrono::steady_clock::now() - m_startTime;
+            m_time = time.count();
+
             m_ibo->bind();
             for(unsigned c = 0; c < m_cams.size(); ++c) {
                 Camera* cam = m_cams[c];
@@ -325,6 +331,7 @@ namespace CrabEngine{
 
                     //pass transformation matrix to vertex shader
                     obj->getMaterial()->setUniformMat4("MVP", MVP);
+                    obj->getMaterial()->setUniform1f("Time_ms", m_time);
 
                     //set object textures
                     for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
@@ -337,19 +344,44 @@ namespace CrabEngine{
 
                     obj->getMaterial()->unbind();
                 }
-                //glUseProgram(0);
-
-                //TODO: do post processing effects
-
-
-
-                m_fbo.unbind();
 
                 m_ibo->unbind();
                 m_vao->unbind();
 
-                drawScreenSpaceTexture(activeTexture, viewport, cam->clearColor.w/255);
+                //do post processing effects
 
+                std::vector<PostEffect*> postEffects = cam->getPostEffects();
+                Texture* lastTexture;
+
+                for(unsigned i = 0; i < postEffects.size(); ++i) {
+                    PostEffect* effect = postEffects[i];
+                    if(!effect->active)
+                        continue;
+
+                    //toggle between textures (need to do this because you cant draw to the same texture that you are drawing)
+                    lastTexture = activeTexture;
+                    if(activeTexture == &m_tex0) {
+                        activeTexture = &m_tex1;
+                    } else {
+                        activeTexture = &m_tex0;
+                    }
+                    m_fbo.setTexture(activeTexture);
+
+                    //draw post processing effect
+                    drawPostEffectQuad(lastTexture, effect->getMaterial());
+
+                }
+
+                lastTexture = nullptr;
+
+                //finally, draw to screen!
+                m_fbo.unbind();
+
+                glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
+                drawScreenSpaceTexture(activeTexture, viewport, cam->clearColor.w/255);
+                activeTexture = nullptr;
+
+                //re-bind vao and ibo for next camera
                 m_vao->bind();
                 m_ibo->bind();
             }
@@ -366,5 +398,23 @@ namespace CrabEngine{
             glClear(GL_COLOR_BUFFER_BIT);
 
         }
+
+        void Renderer2D::drawPostEffectQuad(Texture* tex, Material* mat) {
+            //glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
+
+            tex->bind(0);
+
+            mat->setUniform1i("frame", 0);
+            mat->setUniform1f("Time_ms", m_time);
+
+            m_vaoQuad->bind();
+            m_iboQuad->bind();
+            mat->bind();
+            m_vaoQuad->draw(6);
+            mat->unbind();
+            m_iboQuad->unbind();
+            m_vaoQuad->unbind();
+        }
+
     }
 }

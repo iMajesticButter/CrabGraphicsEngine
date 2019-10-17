@@ -13,8 +13,8 @@ uniform float alpha;
 
 void main() {
     vec4 texColor = texture(tex, UV);
-    if(texColor.w < 0.1)
-        discard;
+    //if(texColor.w < 0.1)
+    //    discard;
     fragColor.xyz = texColor.xyz;
-    fragColor.w = clamp(texColor.w, alpha, 1);
+    fragColor.w = clamp(texColor.w, 0, 1);
 }
