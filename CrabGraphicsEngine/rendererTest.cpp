@@ -58,8 +58,9 @@ int main() {
     sponge.Init();
 
     Texture scene(window);
-    scene.setWidth(1000);
-    scene.setHeight(1000);
+    scene.setWidth(20);
+    scene.setHeight(20);
+    scene.setFilteringMode(NEAREST);
     scene.Init();
 
     Mesh quad;
@@ -139,7 +140,7 @@ int main() {
 
 
     Camera cam;
-    cam.clearColor = Vec4(10, 10, 10, 255);
+    cam.clearColor = Vec4(10, 10, 10, 0);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
@@ -182,6 +183,8 @@ int main() {
         }
         renderer.pushCamera(&cam);
         renderer.pushCamera(&cam2);
+
+        renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1), 1, 1920, 1080);
 
         renderer.end();
 

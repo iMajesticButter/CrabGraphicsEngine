@@ -135,13 +135,8 @@ namespace CrabEngine {
             int count;
             GLFWmonitor* monitor = glfwGetMonitors(&count)[0];
 
-            if(m_MSAA) {
-                //enable 4xMSAA
-                glfwWindowHint(GLFW_SAMPLES, 4);
-            } else {
-                //disable MSAA
-                glfwWindowHint(GLFW_SAMPLES, 1);
-            }
+            //set MSAA
+            glfwWindowHint(GLFW_SAMPLES, m_MSAA);
 
             if(!m_fullscreen) {
                 monitor = nullptr;
