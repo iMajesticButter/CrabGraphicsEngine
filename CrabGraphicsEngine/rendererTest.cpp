@@ -9,6 +9,7 @@
 #include "CrabCamera.h"
 #include "CrabWindow.h"
 #include "CrabPostEffect.h"
+#include "CrabLight.h"
 
 #include <vector>
 
@@ -111,8 +112,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 10;
-    const int h = 10;
+    const int w = 5;
+    const int h = 5;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -123,12 +124,13 @@ int main() {
             obj->setUniform1f("backTest", 1.0f);
             obj->setUniform3f("tint", Vec3((float)x/w, (float)y/h, 1));
 
-            obj->renderLayer = -2;
-            obj->location = Vec3(x * 0.2f,
-                                 y * 0.2f, -3);
-            obj->location.z = 10;
+            obj->renderLayer = 2;
+            obj->location = Vec3(-5+x * 3,
+                                 -5+y * 3, -3);
+            obj->location.z = 0;
             obj->rotation = 0;
-            obj->scale = Vec2(0.1f, 0.1f);
+            obj->scale = Vec2(0.25f, 0.25f);
+            obj->castShadows = true;
 
             objects.push_back(obj);
 
@@ -140,7 +142,7 @@ int main() {
 
 
     Camera cam;
-    cam.clearColor = Vec4(10, 10, 10, 0);
+    cam.clearColor = Vec4(100, 100, 100, 255);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
@@ -150,7 +152,9 @@ int main() {
     cam2.addPostEffect(&postEffectTest);
     cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
 
-    Renderer2D renderer(&window);
+    Light l;
+
+    Renderer2D renderer(&window, Vec3(0,0,0));
 
     bool fullscreen = false;
     bool pressed = false;
@@ -169,22 +173,13 @@ int main() {
         for(unsigned i = 0; i < objects.size(); ++i) {
             renderer.pushObject(objects[i]);
         }
+
+        renderer.pushLight(&l);
+
         renderer.pushCamera(&cam);
         renderer.pushCamera(&cam2);
 
-        renderer.end(&scene);
-
-        player.setTexture("tex", &scene);
-
-        renderer.start();
-
-        for(unsigned i = 0; i < objects.size(); ++i) {
-            renderer.pushObject(objects[i]);
-        }
-        renderer.pushCamera(&cam);
-        renderer.pushCamera(&cam2);
-
-        renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1), 1, 1920, 1080);
+        //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
 
         renderer.end();
 

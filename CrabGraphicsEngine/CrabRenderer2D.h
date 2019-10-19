@@ -4,9 +4,11 @@
 #include "GLEW/glew.h"
 #include "CrabWindow.h"
 #include "CrabMaterial.h"
+#include "CrabVec3.h"
 #include "CrabVec4.h"
 #include "CrabFrameBuffer.h"
 #include "CrabTexture.h"
+#include "CrabLight.h"
 
 #include <vector>
 #include <chrono>
@@ -27,7 +29,9 @@ namespace CrabEngine {
         class Renderer2D {
         public:
 
-            Renderer2D(Window* window);
+            CrabEngine::Math::Vec3 ambientLight;
+
+            Renderer2D(Window* window, CrabEngine::Math::Vec3 ambientLight = CrabEngine::Math::Vec3(1,1,1));
             ~Renderer2D();
 
             void Init();
@@ -38,6 +42,7 @@ namespace CrabEngine {
             void start();
             void pushCamera(Camera* cam);
             void pushObject(GraphicsObject2D* obj);
+            void pushLight(Light* light);
             void end(Texture* outputTexture = nullptr);
 
         private:
@@ -47,6 +52,7 @@ namespace CrabEngine {
             Window* m_window;
 
             std::vector<GraphicsObject2D*> m_objects;
+            std::vector<Light*> m_lights;
             std::vector<Camera*> m_cams;
 
             VAO* m_vao = nullptr;
@@ -62,6 +68,9 @@ namespace CrabEngine {
             unsigned m_numVertecies;
             unsigned m_numIndecies;
 
+            unsigned m_numVerteciesShadowCasters;
+            unsigned m_numIndeciesShadowCasters;
+
             Material m_screenSpaceImageMat;
             FragmentShader m_screenSpaceImageFrag;
             VertexShader m_screenSpaceImageVert;
@@ -69,6 +78,16 @@ namespace CrabEngine {
             FrameBuffer m_fbo;
             Texture m_tex0;
             Texture m_tex1;
+
+            FrameBuffer m_lightFBO;
+            Texture m_shadowCasterTex;
+            Texture m_shadowMapTex;
+            Texture m_lightsTex;
+
+            FragmentShader m_shadowMapFrag;
+            Material m_shadowMapMat;
+            FragmentShader m_lightFrag;
+            Material m_lightMat;
 
             float m_time;
             std::chrono::time_point<std::chrono::steady_clock> m_startTime;

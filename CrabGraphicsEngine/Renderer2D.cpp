@@ -36,12 +36,20 @@ namespace CrabEngine{
         // Renderer 2D
         //-------------------------------------------------------
 
-        Renderer2D::Renderer2D(Window* window) : m_window(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
+        Renderer2D::Renderer2D(Window* window, CrabEngine::Math::Vec3 _ambientLight) : ambientLight(_ambientLight), m_window(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
                 m_screenSpaceImageFrag("./internalShaders/screenSpaceImage.fs"),
                 m_screenSpaceImageVert("./internalShaders/screenSpaceImage.vs"),
                 m_fbo(window),
                 m_tex0(*window),
-                m_tex1(*window) {
+                m_tex1(*window),
+                m_lightFBO(window),
+                m_shadowCasterTex(*window),
+                m_shadowMapTex(*window),
+                m_lightsTex(*window),
+                m_shadowMapFrag("./internalShaders/shadowMap.fs"),
+                m_shadowMapMat(*window, "Shadow Map Material"),
+                m_lightFrag("./internalShaders/light.fs"),
+                m_lightMat(*window, "Light Material") {
             windowInitEventCallback callback;
             callback.context = this;
             callback.func = InitCallback;
@@ -53,6 +61,18 @@ namespace CrabEngine{
 
             m_tex0.setFilteringMode(LINEAR);
             m_tex1.setFilteringMode(LINEAR);
+
+            m_shadowCasterTex.setFilteringMode(LINEAR);
+            m_shadowMapTex.setFilteringMode(LINEAR);
+            m_lightsTex.setFilteringMode(LINEAR);
+
+            m_shadowMapMat.AddShader(m_screenSpaceImageVert);
+            m_shadowMapMat.AddShader(m_shadowMapFrag);
+            m_shadowMapMat.Initialize();
+
+            m_lightMat.AddShader(m_screenSpaceImageVert);
+            m_lightMat.AddShader(m_lightFrag);
+            m_lightMat.Initialize();
 
             //set start time
             m_startTime = std::chrono::steady_clock::now();
@@ -189,6 +209,7 @@ namespace CrabEngine{
 
             m_active = true;
             m_objects.clear();
+            m_lights.clear();
             m_cams.clear();
 
             m_numIndecies = 0;
@@ -205,6 +226,11 @@ namespace CrabEngine{
             }
 
         }
+        void Renderer2D::pushLight(Light* light) {
+            if(light->active) {
+                m_lights.push_back(light);
+            }
+        }
         void Renderer2D::pushObject(GraphicsObject2D* obj) {
             if(!m_active) {
                 std::cerr << "Renderer is not active!, call Renderer2D::start()" << std::endl;
@@ -216,8 +242,14 @@ namespace CrabEngine{
 
                 m_numVertecies += obj->getMesh()->vertecies.size();
                 m_numIndecies += obj->getMesh()->triangles.size();
-            }
 
+                if(obj->castShadows) {
+                    //m_shadowCasters.push_back(obj);
+
+                    m_numVerteciesShadowCasters += obj->getMesh()->vertecies.size();
+                    m_numIndeciesShadowCasters += obj->getMesh()->triangles.size();
+                }
+            }
         }
 
 
@@ -249,7 +281,6 @@ namespace CrabEngine{
             unsigned offset = 0;
 
             for(unsigned i = 0; i < m_objects.size(); ++i) {
-                //copy data to vbo
                 data = m_objects[i]->getMesh()->getVertexData();
 
                 //copy data to ibo
@@ -262,11 +293,12 @@ namespace CrabEngine{
                 //copy data to vbo
                 memcpy(vboDataIterator, &data.front(), sizeof(GLfloat) * data.size());
                 vboDataIterator += data.size();
+
             }
             iboDataIterator = nullptr;
             vboDataIterator = nullptr;
 
-            //push ibodata to ibo and vbo
+            //push data to ibo and vbo
             m_ibo->setData(m_numIndecies, iboData);
             m_vbo->setData(sizeof(GLfloat) * (m_numVertecies*4), vboData);
 
@@ -313,12 +345,134 @@ namespace CrabEngine{
             std::chrono::duration<double> time = std::chrono::steady_clock::now() - m_startTime;
             m_time = time.count();
 
-            m_ibo->bind();
             for(unsigned c = 0; c < m_cams.size(); ++c) {
                 Camera* cam = m_cams[c];
 
                 Vec4 viewport = cam->getViewportAsVec4();
 
+                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * fbWidth, viewport.w * fbHeight, 1.0f, 1000.0f);
+                Mat4 viewMatrix = cam->getTansformationMatrix();
+
+                unsigned indexOffset = 0;
+
+                m_vao->bind();
+                m_ibo->bind();
+
+
+                //--------------------------------------------------------
+                // Lighting
+                //--------------------------------------------------------
+
+                //generate light texture (a texture that contains all the lit up areas and their colors)
+                m_lightsTex.setWidth(viewport.z * fbWidth);
+                m_lightsTex.setHeight(viewport.w * fbHeight);
+                m_lightsTex.Resize();
+
+                m_lightFBO.bind();
+                m_lightFBO.setTexture(&m_lightsTex);
+
+                glClearColor(ambientLight.x, ambientLight.y, ambientLight.z, 0);
+                glClear(GL_COLOR_BUFFER_BIT);
+                glClearColor(0, 0, 0, 0);
+
+                for(unsigned l = 0; l < m_lights.size(); ++l) {
+                    Light* light = m_lights[l];
+
+                    //render shadow casters to screen with light in the middle
+                    m_shadowCasterTex.setWidth(light->getShadowTextureResolution());
+                    m_shadowCasterTex.setHeight(light->getShadowTextureResolution());
+                    m_shadowCasterTex.Resize();
+                    m_shadowMapTex.setWidth(light->getShadowTextureResolution());
+                    m_shadowMapTex.setHeight(1);
+                    m_shadowMapTex.Resize();
+
+                    m_lightFBO.resize(light->getShadowTextureResolution(), light->getShadowTextureResolution());
+
+                    m_lightFBO.setTexture(&m_shadowCasterTex);
+                    glClear(GL_COLOR_BUFFER_BIT);
+
+                    glViewport(0, 0, light->getShadowTextureResolution(), light->getShadowTextureResolution());
+
+                    Mat4 lightMatrix = light->getViewMatrix();
+
+                    //draw all shadow casters to shadowCasterTex centered on the light position
+                    for(unsigned o = 0; o < m_objects.size(); ++o) {
+                        GraphicsObject2D* obj = m_objects[o];
+                        if(!obj->castShadows) {
+                            indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
+                            continue;
+                        }
+
+                        //set object settings
+                        obj->getMaterial()->bind();
+                        obj->applyUniforms();
+
+                        //get transformation matrix
+                        ScaleMatrix scaleMatrix(obj->scale);
+                        RotationMatrix2D rotationMatrix(obj->rotation);
+                        TranslationMatrix translationMatrix(obj->location);
+                        Mat4 MVP = projectionMatrix * lightMatrix * translationMatrix * rotationMatrix * scaleMatrix;
+
+                        //pass transformation matrix to vertex shader
+                        obj->getMaterial()->setUniformMat4("MVP", MVP);
+                        obj->getMaterial()->setUniform1f("Time_ms", m_time);
+
+                        //set object textures
+                        for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
+                            obj->getTexture(j).tex->bind(j);
+                            obj->getMaterial()->setUniform1i(obj->getTexture(j).name, j);
+                        }
+
+                        m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
+                        indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
+
+                        obj->getMaterial()->unbind();
+                    }
+
+
+                    //generate shadow map
+                    m_lightFBO.setTexture(&m_shadowMapTex);
+
+                    glViewport(0, 0, light->getShadowTextureResolution(), 1);
+
+                    m_shadowMapMat.setUniform2f("resolution", light->getShadowTextureResolution(), 1);
+
+                    drawPostEffectQuad(&m_shadowCasterTex, &m_shadowMapMat);
+
+                    //draw the light to the screen
+                    //DEBUG: not transforming light atm
+
+                    m_lightFBO.setTexture(&m_lightsTex);
+
+                    glViewport(0, 0, viewport.z * fbWidth, viewport.w * fbHeight);
+
+                    m_lightMat.setUniform3f("lightColor", light->color);
+                    m_lightMat.setUniform2f("resolution", light->getShadowTextureResolution(), light->getShadowTextureResolution());
+                    m_lightMat.setUniform2f("lightPos", light->location);
+                    m_lightMat.setUniform1f("falloff", light->falloff);
+                    m_lightMat.setUniform1f("intencity", light->intencity);
+
+                    drawPostEffectQuad(&m_shadowMapTex, &m_lightMat);
+
+                }
+
+                m_lightFBO.unbind();
+
+                drawScreenSpaceTexture(&m_lightsTex);
+
+                continue;
+
+
+
+
+
+
+                //--------------------------------------------------------
+                // Rendering
+                //--------------------------------------------------------
+
+
+                //render all objects to the screen
 
                 //set up frame buffer and textures
                 m_tex0.setWidth(viewport.z * fbWidth);
@@ -338,15 +492,10 @@ namespace CrabEngine{
                 glClearColor(cam->clearColor.x/255, cam->clearColor.y/255, cam->clearColor.z/255, cam->clearColor.w/255);
                 glClear(GL_COLOR_BUFFER_BIT);
 
-
-
-                Mat4 projectionMatrix = PerspectiveProjectionMatrix(cam->fov, viewport.z * fbWidth, viewport.w * fbHeight, 1.0f, 1000.0f);
-                Mat4 viewMatrix = cam->getTansformationMatrix();
-
                 //glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
                 glViewport(0, 0, viewport.z * fbWidth, viewport.w * fbHeight);
 
-                unsigned indexOffset = 0;
+                indexOffset = 0;
 
 
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
@@ -424,16 +573,13 @@ namespace CrabEngine{
                 if(outTex) {
                     m_fbo.unbind();
                 }
-
-                //re-bind vao and ibo for next camera
-                m_vao->bind();
-                m_ibo->bind();
             }
             m_ibo->unbind();
 
             m_vao->unbind();
 
             m_objects.clear();
+            m_lights.clear();
             m_cams.clear();
 
             if(!outTex) {

@@ -59,6 +59,7 @@ namespace CrabEngine {
             int renderLayer = 0;
 
             bool visible;
+            bool castShadows;
 
             GraphicsObject2D();
             GraphicsObject2D(Mesh* mesh, Material* mat);
