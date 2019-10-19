@@ -26,6 +26,9 @@ namespace CrabEngine {
             Mat4& operator*=(const Mat4& other);
             Mat4& operator=(const Mat4& other);
 
+            Vec4 operator*(const Vec4& other);
+            Vec3 operator*(const Vec3& other);
+
         protected:
             //4x4 matrix data
             float m_mat[4*4];
