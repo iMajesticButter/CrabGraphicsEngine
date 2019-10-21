@@ -85,8 +85,10 @@ namespace CrabEngine {
             Texture m_lightsTex;
 
             FragmentShader m_shadowMapFrag;
+            VertexShader m_shadowMapVert;
             Material m_shadowMapMat;
             FragmentShader m_lightFrag;
+            VertexShader m_lightVert;
             Material m_lightMat;
 
             float m_time;

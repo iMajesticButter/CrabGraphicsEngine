@@ -108,6 +108,7 @@ int main() {
     player.setTexture("tex", &sponge);
     player.setUniform3f("tint", Vec3(1));
     player.renderLayer = 1;
+    player.castShadows = true;
 
     objects.push_back(&player);
 
@@ -142,7 +143,7 @@ int main() {
 
 
     Camera cam;
-    cam.clearColor = Vec4(100, 100, 100, 255);
+    cam.clearColor = Vec4(100, 100, 100, 0);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
@@ -177,7 +178,7 @@ int main() {
         renderer.pushLight(&l);
 
         renderer.pushCamera(&cam);
-        renderer.pushCamera(&cam2);
+        //renderer.pushCamera(&cam2);
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
 
