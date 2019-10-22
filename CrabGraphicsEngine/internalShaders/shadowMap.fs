@@ -21,7 +21,7 @@ void main() {
 
     float smallestDist = 1.0;
 
-    for(float i = 0.0; i < resolution.x; ++i) {
+    for(float i = 0.0; i < resolution.x; i += 1.0) {
         //polar to normal coordinates
         vec2 coord = vec2(cos(angle), sin(angle)) * (i/resolution.x);
         coord.x = (coord.x+1)/2;
@@ -31,13 +31,14 @@ void main() {
         vec4 texCol = texture(frame, coord);
 
         //check if sample passes Threshold
+        float dst = i/resolution.x;
 
         if(texCol.w > THRESHOLD) {
             //set smallestDist
-            smallestDist = min(i/resolution.x, smallestDist);
+            smallestDist = min(smallestDist, dst);
         }
     }
 
-    fragColor = vec4(smallestDist);
+    fragColor = vec4(vec3(smallestDist), 1.0f);
 
 }

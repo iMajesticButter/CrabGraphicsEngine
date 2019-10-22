@@ -5,8 +5,8 @@
 namespace CrabEngine {
     namespace Graphics {
 
-        Light::Light(CrabEngine::Math::Vec2 loc, CrabEngine::Math::Vec3 _color, float _falloff, float _intencity, float _size, bool _castShadows) :
-            location(loc), color(_color), falloff(_falloff), intencity(_intencity), size(_size), castShadows(_castShadows), active(true), m_shadowResolution(256) {
+        Light::Light(CrabEngine::Math::Vec2 loc, CrabEngine::Math::Vec3 _color, float _falloff, float _intencity, float _size, float _softness, bool _castShadows) :
+            location(loc), color(_color), falloff(_falloff), intencity(_intencity), size(_size), softness(_softness), castShadows(_castShadows), active(true), m_shadowResolution(256) {
         }
 
         //! set the shadow resolution level, the shadow resolution will be 2 to the power of this number

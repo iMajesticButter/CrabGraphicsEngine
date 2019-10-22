@@ -17,7 +17,7 @@ int main() {
     using namespace CrabEngine::Graphics;
     using namespace CrabEngine::Math;
 
-    Window window(Vec2(-1), "Rendedrer Test", false, false, true, false, true);
+    Window window(Vec2(-1), "Rendedrer Test", false, false, true, false, 4);
 
     VertexShader vertShader("./shaders/vertShaderTest.vs");
     FragmentShader fragShader("./shaders/fragShaderTest.fs");

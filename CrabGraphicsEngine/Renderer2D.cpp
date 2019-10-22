@@ -464,6 +464,7 @@ namespace CrabEngine{
                     m_lightMat.setUniform2f("lightPos", light->location);
                     m_lightMat.setUniform1f("falloff", light->falloff);
                     m_lightMat.setUniform1f("intencity", light->intencity);
+                    m_lightMat.setUniform1f("softness", light->softness);
 
                     drawPostEffectQuad(&m_shadowMapTex, &m_lightMat);
 

@@ -16,11 +16,12 @@ namespace CrabEngine {
             float falloff;
             float intencity;
             float size;
+            float softness;
 
             bool castShadows;
             bool active;
 
-            Light(CrabEngine::Math::Vec2 loc = CrabEngine::Math::Vec2(0,0), CrabEngine::Math::Vec3 color = CrabEngine::Math::Vec3(1,1,1), float falloff = 5, float intencity = 1, float size = 5, bool castShadows = false);
+            Light(CrabEngine::Math::Vec2 loc = CrabEngine::Math::Vec2(0,0), CrabEngine::Math::Vec3 color = CrabEngine::Math::Vec3(1,1,1), float falloff = 1, float intencity = 1, float size = 5, float softness = 0.25, bool castShadows = false);
 
             //! set the shadow resolution level, the shadow resolution will be 2 to the power of this number
             /*!
