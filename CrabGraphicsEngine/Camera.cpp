@@ -16,7 +16,7 @@ namespace CrabEngine {
             ScaleMatrix scaleMat(Vec2(scale, scale));
             RotationMatrix2D rotMat(-rotation);
             TranslationMatrix transMat(Vec4(-location, 10.0f, 1.0f));
-            return transMat * rotMat * scaleMat;
+            return rotMat * scaleMat * transMat;
         }
 
         // set the camera viewport

@@ -20,8 +20,10 @@ namespace CrabEngine {
 
         CrabEngine::Math::Mat4 Light::getViewMatrix() {
             using namespace CrabEngine::Math;
+            float scale = 1/size;
+            ScaleMatrix scaleMat(Vec2(scale, scale));
             TranslationMatrix transMat(Vec4(-location, 10.0f, 1.0f));
-            return transMat;
+            return scaleMat * transMat;
         }
 
     }

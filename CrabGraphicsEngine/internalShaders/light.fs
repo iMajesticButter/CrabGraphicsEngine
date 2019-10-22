@@ -14,7 +14,6 @@ uniform sampler2D frame;
 uniform float Time_ms;
 uniform vec3 lightColor;
 uniform vec2 resolution;
-uniform vec2 lightPos;
 uniform float falloff;
 uniform float intencity;
 uniform float softness;
@@ -51,6 +50,12 @@ void main() {
 	sum += sample(vec2(tc.x + 2.0*blur, tc.y), r) * 0.09;
 	sum += sample(vec2(tc.x + 1.0*blur, tc.y), r) * 0.05;
 
-    fragColor = vec4(lightColor, 1.0) * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r*falloff)) * intencity;
+	float dist = r*falloff;
+
+	float att = clamp(1.0 - dist/1.0, 0.0, 1.0);
+	att *= att;
+
+    //fragColor = vec4(lightColor, intencity) * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
+	fragColor = vec4(lightColor, intencity) * vec4(vec3(1.0), sum * att);
 
 }

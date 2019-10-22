@@ -105,10 +105,10 @@ int main() {
 
 
     GraphicsObject2D player(&quad, &material2);
-    player.setTexture("tex", &sponge);
+    player.setTexture("tex", &mrKrabs);
     player.setUniform3f("tint", Vec3(1));
     player.renderLayer = 1;
-    player.castShadows = true;
+    player.castShadows = false;
 
     objects.push_back(&player);
 
@@ -154,6 +154,17 @@ int main() {
     cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
 
     Light l;
+    l.size = 2;
+    l.softness = 1;
+    l.setShadowResolution(10);
+    l.location = Vec2(1,1);
+    l.castShadows = true;
+    l.intencity = 1;
+    l.falloff = 1;
+
+    Light l2;
+    l2.color = Vec3(1,1,0);
+    l2.castShadows = true;
 
     Renderer2D renderer(&window, Vec3(0,0,0));
 
@@ -163,7 +174,8 @@ int main() {
     while(!window.shouldClose()) {
 
         cam.location = PlayerPos;
-        player.location = PlayerPos;
+        //player.location = PlayerPos;
+        l.location = PlayerPos;
 
 
         material.setUniform2f("mousePos", window.cursorX(), -(window.cursorY()-window.fbHeight()));
@@ -176,6 +188,7 @@ int main() {
         }
 
         renderer.pushLight(&l);
+        renderer.pushLight(&l2);
 
         renderer.pushCamera(&cam);
         //renderer.pushCamera(&cam2);
@@ -196,6 +209,44 @@ int main() {
         if(window.keyDown(GLFW_KEY_D)) {
             PlayerPos.x += 0.01f;
         }
+        if(window.keyDown(GLFW_KEY_UP)) {
+            cam.fov += 2;
+        }
+        if(window.keyDown(GLFW_KEY_DOWN)) {
+            cam.fov -= 2;
+        }
+        if(window.keyDown(GLFW_KEY_LEFT)) {
+            cam.rotation += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_RIGHT)) {
+            cam.rotation -= 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_EQUAL)) {
+            l.size += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_MINUS)) {
+            l.size -= 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_LEFT_BRACKET)) {
+            cam.size += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_RIGHT_BRACKET)) {
+            cam.size -= 0.01f;
+        }
+
+        if(window.keyDown(GLFW_KEY_O)) {
+            l.intencity += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_L)) {
+            l.intencity -= 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_I)) {
+            l.falloff += 0.01f;
+        }
+        if(window.keyDown(GLFW_KEY_K)) {
+            l.falloff -= 0.01f;
+        }
+
         if(window.keyDown(GLFW_KEY_F11)) {
             if(!pressed) {
                 fullscreen = !fullscreen;

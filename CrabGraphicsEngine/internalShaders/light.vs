@@ -9,7 +9,9 @@ in vec2 in_UV;
 
 out vec2 UV;
 
+uniform mat4 MVP;
+
 void main() {
     UV = in_UV;
-    gl_Position = in_Position;
+    gl_Position = MVP * in_Position;
 }
