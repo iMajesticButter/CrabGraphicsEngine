@@ -20,7 +20,7 @@ uniform float intencity;
 uniform float softness;
 
 float sample(vec2 coord, float r) {
-	return step(r, texture2D(frame, coord).r);
+	return smoothstep(r-0.01, r+0.01, texture2D(frame, coord).r);
 }
 
 void main() {
