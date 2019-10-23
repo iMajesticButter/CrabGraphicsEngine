@@ -155,8 +155,8 @@ int main() {
 
     Light l;
     l.size = 2;
-    l.softness = 1;
-    l.setShadowResolution(10);
+    l.softness = 8;
+    l.setShadowResolution(12);
     l.location = Vec2(1,1);
     l.castShadows = true;
     l.intencity = 1;

@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <chrono>
+#include <math.h>
 
 #define byte unsigned char
 
@@ -78,6 +79,7 @@ namespace CrabEngine {
             FrameBuffer m_fbo;
             Texture m_tex0;
             Texture m_tex1;
+            Texture m_ditherPattern;
 
             FrameBuffer m_lightFBO;
             Texture m_shadowCasterTex;

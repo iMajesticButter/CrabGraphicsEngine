@@ -42,6 +42,7 @@ namespace CrabEngine{
                 m_fbo(window),
                 m_tex0(*window),
                 m_tex1(*window),
+                m_ditherPattern(*window),
                 m_lightFBO(window),
                 m_shadowCasterTex(*window),
                 m_shadowMapTex(*window),
@@ -75,6 +76,26 @@ namespace CrabEngine{
             m_shadowCasterTex.setFilteringMode(LINEAR);
             m_shadowMapTex.setFilteringMode(LINEAR);
             m_lightsTex.setFilteringMode(LINEAR);
+
+
+
+            //set up dithering
+
+            const std::vector<unsigned char> ditherPattern = {
+                0, 0, 0, 32, 0, 0,  8, 0, 0, 40, 0, 0,  2, 0, 0, 34, 0, 0, 10, 0, 0, 42, 0, 0,   /* 8x8 Bayer ordered dithering  */
+                48, 0, 0, 16, 0, 0, 56, 0, 0, 24, 0, 0, 50, 0, 0, 18, 0, 0, 58, 0, 0, 26, 0, 0,  /* pattern.  Each input pixel   */
+                12, 0, 0, 44, 0, 0,  4, 0, 0, 36, 0, 0, 14, 0, 0, 46, 0, 0,  6, 0, 0, 38, 0, 0,  /* is scaled to the 0..63 range */
+                60, 0, 0, 28, 0, 0, 52, 0, 0, 20, 0, 0, 62, 0, 0, 30, 0, 0, 54, 0, 0, 22, 0, 0,  /* before looking in this table */
+                3, 0, 0, 35, 0, 0, 11, 0, 0, 43, 0, 0,  1, 0, 0, 33, 0, 0,  9, 0, 0, 41, 0, 0,   /* to determine the action.     */
+                51, 0, 0, 19, 0, 0, 59, 0, 0, 27, 0, 0, 49, 0, 0, 17, 0, 0, 57, 0, 0, 25, 0, 0,
+                15, 0, 0, 47, 0, 0,  7, 0, 0, 39, 0, 0, 13, 0, 0, 45, 0, 0,  5, 0, 0, 37, 0, 0,
+                63, 0, 0, 31, 0, 0, 55, 0, 0, 23, 0, 0, 61, 0, 0, 29, 0, 0, 53, 0, 0, 21, 0, 0
+            };
+
+            m_ditherPattern.setData(ditherPattern, 8, 8, GL_RGB);
+            m_ditherPattern.Init();
+
+
 
             //set start time
             m_startTime = std::chrono::steady_clock::now();
@@ -189,8 +210,10 @@ namespace CrabEngine{
             m_screenSpaceImageMat.setUniform1f("alpha", alpha);
 
             tex->bind(0);
+            m_ditherPattern.bind(1);
 
             m_screenSpaceImageMat.setUniform1i("tex", 0);
+            m_screenSpaceImageMat.setUniform1i("ditherSampler", 1);
 
             m_vaoQuad->bind();
             m_iboQuad->bind();
@@ -381,9 +404,12 @@ namespace CrabEngine{
                 glClear(GL_COLOR_BUFFER_BIT);
                 glClearColor(0, 0, 0, 0);
 
+                glBlendFunc(GL_ONE, GL_ONE);
+
                 for(unsigned l = 0; l < m_lights.size(); ++l) {
                     Light* light = m_lights[l];
 
+                    //unsigned res = light->getShadowTextureResolution();
                     unsigned res = light->getShadowTextureResolution();
 
                     //render shadow casters to screen with light in the middle
@@ -447,7 +473,7 @@ namespace CrabEngine{
                         //generate shadow map
                         m_lightFBO.resize(res, 1);
                         m_lightFBO.setTexture(&m_shadowMapTex);
-                        glClear(GL_COLOR_BUFFER_BIT);
+                        //glClear(GL_COLOR_BUFFER_BIT);
 
                         glViewport(0, 0, res, 1);
 
@@ -476,9 +502,14 @@ namespace CrabEngine{
                     m_lightMat.setUniform1f("intencity", light->intencity);
                     m_lightMat.setUniform1f("softness", light->softness);
 
+                    m_ditherPattern.bind(1);
+
+                    m_lightMat.setUniform1i("ditherPattern", 1);
+
                     //draw the light at the light location
 
-                    ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*2.7f);
+                    //ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*2.7f);
+                    ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*(30.0f/11));
                     TranslationMatrix translationMatrix(Vec4(light->location, 0.0, 1.0));
                     Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * scaleMatrix;
 
@@ -490,6 +521,7 @@ namespace CrabEngine{
                 }
 
                 m_lightFBO.unbind();
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                 //drawScreenSpaceTexture(&m_shadowCasterTex, Vec4(0,0,1,1), 0);
                 drawScreenSpaceTexture(&m_lightsTex, Vec4(0,0,1,1), 0);

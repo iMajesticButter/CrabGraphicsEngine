@@ -9,6 +9,7 @@ in vec2 UV;
 out vec4 fragColor;
 
 uniform sampler2D tex;
+uniform sampler2D ditherSampler;
 uniform float alpha;
 
 void main() {
@@ -17,4 +18,5 @@ void main() {
     //    discard;
     fragColor.xyz = texColor.xyz;
     fragColor.w = clamp(texColor.w, alpha, 1);
+    fragColor += vec4(texture(ditherSampler, gl_FragCoord.xy / 8.0).r / 32.0 - (1.0 / 128.0));
 }

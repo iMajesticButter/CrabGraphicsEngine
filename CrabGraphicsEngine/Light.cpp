@@ -11,7 +11,7 @@ namespace CrabEngine {
 
         //! set the shadow resolution level, the shadow resolution will be 2 to the power of this number
         void Light::setShadowResolution(unsigned res) {
-            m_shadowResolution = pow(2, std::min(res, 10u));
+            m_shadowResolution = pow(2, std::max(6u, std::min(res, 12u)));
         }
 
         unsigned Light::getShadowTextureResolution() {

@@ -25,7 +25,7 @@ namespace CrabEngine {
 
             //! set the shadow resolution level, the shadow resolution will be 2 to the power of this number
             /*!
-              This number has a max value of 10!
+              This number has a max value of 12 and a min value of 6!
             */
             void setShadowResolution(unsigned res);
 

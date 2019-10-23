@@ -5,12 +5,14 @@
 //--------------------------------------------------------------------------------------------------------
 
 #define PI 3.141
+#define BIAS 0.005
 
 in vec2 UV;
 
 out vec4 fragColor;
 
 uniform sampler2D frame;
+uniform sampler2D ditherPattern;
 uniform float Time_ms;
 uniform vec3 lightColor;
 uniform vec2 resolution;
@@ -19,7 +21,7 @@ uniform float intencity;
 uniform float softness;
 
 float sample(vec2 coord, float r) {
-	return smoothstep(r-0.01, r+0.01, texture2D(frame, coord).r);
+	return smoothstep(r-BIAS, r, texture2D(frame, coord).r);
 }
 
 void main() {
@@ -56,6 +58,6 @@ void main() {
 	att *= att;
 
     //fragColor = vec4(lightColor, intencity) * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
-	fragColor = vec4(lightColor, intencity) * vec4(vec3(1.0), sum * att);
-
+	fragColor = (vec4(lightColor, 1.0) * vec4(sum * att)) * intencity;
+	fragColor += vec4(texture(ditherPattern, gl_FragCoord.xy / 8.0).r / 16.0 - (1.0 / 128.0));
 }
