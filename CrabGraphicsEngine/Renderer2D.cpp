@@ -40,6 +40,8 @@ namespace CrabEngine{
                 m_screenSpaceImageFrag("./internalShaders/screenSpaceImage.fs"),
                 m_screenSpaceImageVert("./internalShaders/screenSpaceImage.vs"),
                 m_fbo(window),
+                m_fbo0(window),
+                m_fbo1(window),
                 m_tex0(*window),
                 m_tex1(*window),
                 m_ditherPattern(*window),
@@ -73,7 +75,16 @@ namespace CrabEngine{
             m_lightMat.Initialize();
 
             m_tex0.setFilteringMode(LINEAR);
+            m_tex0.Resize();
+            m_fbo0.resize(1,1);
+            m_fbo0.bind();
+            m_fbo0.setTexture(&m_tex0);
+
             m_tex1.setFilteringMode(LINEAR);
+            m_tex1.Resize();
+            m_fbo1.resize(1,1);
+            m_fbo1.bind();
+            m_fbo1.setTexture(&m_tex1);
 
             m_shadowCasterTex.setFilteringMode(LINEAR);
             m_shadowCasterTex.Resize();
@@ -421,7 +432,7 @@ namespace CrabEngine{
 
                 glBlendFunc(GL_ONE, GL_ONE);
 
-                unsigned res = 0;
+                unsigned lres = 0;
 
                 for(unsigned l = 0; l < m_lights.size(); ++l) {
                     auto start = std::chrono::high_resolution_clock::now();
@@ -429,23 +440,31 @@ namespace CrabEngine{
 
                     //unsigned res = light->getShadowTextureResolution();
                     //res = 2048;
+
+                    unsigned res = lres;
+
                     if(res != light->getShadowTextureResolution()) {
-                        res = light->getShadowTextureResolution();
 
-                        //render shadow casters to screen with light in the middle
+                        if(light->castShadows || lres == 0) {
+                            res = light->getShadowTextureResolution();
 
-                        m_shadowCasterTex.setWidth(res);
-                        m_shadowCasterTex.setHeight(res);
-                        m_shadowCasterTex.setFormat(GL_RGBA);
-                        m_shadowCasterTex.Resize();
-                        m_shadowMapTex.setWidth(res);
-                        m_shadowMapTex.setHeight(1);
-                        m_shadowMapTex.setFormat(GL_RGBA);
-                        m_shadowMapTex.Resize();
+                            //render shadow casters to screen with light in the middle
 
-                        m_shadowCasterFBO.resize(res, res);
-                        m_shadowMapFBO.resize(res, 1);
+                            m_shadowCasterTex.setWidth(res);
+                            m_shadowCasterTex.setHeight(res);
+                            m_shadowCasterTex.setFormat(GL_RGBA);
+                            m_shadowCasterTex.Resize();
+                            m_shadowMapTex.setWidth(res);
+                            m_shadowMapTex.setHeight(1);
+                            m_shadowMapTex.setFormat(GL_RGBA);
+                            m_shadowMapTex.Resize();
 
+                            m_shadowCasterFBO.resize(res, res);
+                            m_shadowMapFBO.resize(res, 1);
+
+                        } else {
+                            res = lres;
+                        }
                     }
 
                     m_shadowCasterFBO.bind();
@@ -460,6 +479,10 @@ namespace CrabEngine{
                         Mat4 lightMatrix = light->getViewMatrix();
                         m_ibo->bind();
                         m_vao->bind();
+
+                        Material* lastMat = nullptr;
+                        Material* mat = nullptr;
+
                         //draw all shadow casters to shadowCasterTex centered on the light position
                         indexOffset = 0;
                         for(unsigned o = 0; o < m_objects.size(); ++o) {
@@ -469,8 +492,10 @@ namespace CrabEngine{
                                 continue;
                             }
 
+
+                            mat = obj->getMaterial();
                             //set object settings
-                            obj->getMaterial()->bind();
+                            mat->bind();
                             obj->applyUniforms();
 
                             //get transformation matrix
@@ -480,19 +505,22 @@ namespace CrabEngine{
                             Mat4 MVP = projectionMatrix1to1 * lightMatrix * translationMatrix * rotationMatrix * scaleMatrix;
 
                             //pass transformation matrix to vertex shader
-                            obj->getMaterial()->setUniformMat4("MVP", MVP);
-                            obj->getMaterial()->setUniform1f("Time_ms", m_time);
+                            mat->setUniformMat4("MVP", MVP);
+                            if(lastMat != mat) {
+                                mat->setUniform1f("Time_ms", m_time);
+                            }
 
                             //set object textures
                             for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
                                 obj->getTexture(j).tex->bind(j);
-                                obj->getMaterial()->setUniform1i(obj->getTexture(j).name, j);
+                                mat->setUniform1i(obj->getTexture(j).name, j);
                             }
 
                             m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
                             indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
 
-                            obj->getMaterial()->unbind();
+                            mat->unbind();
+                            lastMat = mat;
                         }
                         m_vao->unbind();
                         m_ibo->unbind();
@@ -583,13 +611,14 @@ namespace CrabEngine{
                 m_tex1.setWidth(viewport.z * fbWidth);
                 m_tex1.setHeight(viewport.w * fbHeight);
                 m_tex1.Resize();
-                m_fbo.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+                m_fbo0.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+                m_fbo1.resize(viewport.z * fbWidth, viewport.w * fbHeight);
 
                 Texture* activeTexture = &m_tex0;
 
-                m_fbo.bind();
+                m_fbo0.bind();
 
-                m_fbo.setTexture(&m_tex0);
+                //m_fbo.setTexture(&m_tex0);
 
                 glClearColor(cam->clearColor.x/255, cam->clearColor.y/255, cam->clearColor.z/255, cam->clearColor.w/255);
                 glClear(GL_COLOR_BUFFER_BIT);
@@ -599,11 +628,16 @@ namespace CrabEngine{
 
                 indexOffset = 0;
 
+                Material* lastMat = nullptr;
+                Material* mat = nullptr;
+
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
                     GraphicsObject2D* obj = m_objects[o];
 
+                    mat = obj->getMaterial();
+
                     //set object settings
-                    obj->getMaterial()->bind();
+                    mat->bind();
                     obj->applyUniforms();
 
                     //get transformation matrix
@@ -613,19 +647,22 @@ namespace CrabEngine{
                     Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;
 
                     //pass transformation matrix to vertex shader
-                    obj->getMaterial()->setUniformMat4("MVP", MVP);
-                    obj->getMaterial()->setUniform1f("Time_ms", m_time);
+                    mat->setUniformMat4("MVP", MVP);
+                    if(lastMat != mat) {
+                        mat->setUniform1f("Time_ms", m_time);
+                    }
 
                     //set object textures
                     for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
                         obj->getTexture(j).tex->bind(j);
-                        obj->getMaterial()->setUniform1i(obj->getTexture(j).name, j);
+                        mat->setUniform1i(obj->getTexture(j).name, j);
                     }
 
                     m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
                     indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
 
-                    obj->getMaterial()->unbind();
+                    mat->unbind();
+                    lastMat = mat;
                 }
 
                 m_vao->unbind();
@@ -645,10 +682,12 @@ namespace CrabEngine{
                     lastTexture = activeTexture;
                     if(activeTexture == &m_tex0) {
                         activeTexture = &m_tex1;
+                        m_fbo1.bind();
                     } else {
                         activeTexture = &m_tex0;
+                        m_fbo0.bind();
                     }
-                    m_fbo.setTexture(activeTexture);
+                    //m_fbo.setTexture(activeTexture);
 
                     //draw post processing effect
                     drawPostEffectQuad(lastTexture, effect->getMaterial());
@@ -659,10 +698,10 @@ namespace CrabEngine{
 
                 //finally, draw to screen!
                 if(outTex) {
-                    m_fbo.unbind();
-                    m_fbo.resize(fbWidth, fbHeight);
+                    //m_fbo.unbind();
+                    //m_fbo.resize(fbWidth, fbHeight);
                     m_fbo.bind();
-                    m_fbo.setTexture(outputTexture);
+                    //m_fbo.setTexture(outputTexture);
                 } else {
                     m_fbo.unbind();
                 }

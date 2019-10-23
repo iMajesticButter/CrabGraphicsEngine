@@ -77,6 +77,8 @@ namespace CrabEngine {
             VertexShader m_screenSpaceImageVert;
 
             FrameBuffer m_fbo;
+            FrameBuffer m_fbo0;
+            FrameBuffer m_fbo1;
             Texture m_tex0;
             Texture m_tex1;
             Texture m_ditherPattern;
