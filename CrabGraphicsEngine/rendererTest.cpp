@@ -113,8 +113,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 5;
-    const int h = 5;
+    const int w = 10;
+    const int h = 10;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -165,6 +165,7 @@ int main() {
     Light l2;
     l2.color = Vec3(1,1,0);
     l2.castShadows = true;
+    l2.setShadowResolution(12);
 
     Renderer2D renderer(&window, Vec3(0,0,0));
 
@@ -191,7 +192,7 @@ int main() {
         renderer.pushLight(&l2);
 
         renderer.pushCamera(&cam);
-        //renderer.pushCamera(&cam2);
+        renderer.pushCamera(&cam2);
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
 

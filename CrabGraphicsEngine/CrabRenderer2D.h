@@ -81,10 +81,12 @@ namespace CrabEngine {
             Texture m_tex1;
             Texture m_ditherPattern;
 
-            FrameBuffer m_lightFBO;
             Texture m_shadowCasterTex;
+            FrameBuffer m_shadowCasterFBO;
             Texture m_shadowMapTex;
+            FrameBuffer m_shadowMapFBO;
             Texture m_lightsTex;
+            FrameBuffer m_lightFBO;
 
             FragmentShader m_shadowMapFrag;
             VertexShader m_shadowMapVert;

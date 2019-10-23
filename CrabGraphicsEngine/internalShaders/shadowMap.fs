@@ -33,10 +33,14 @@ void main() {
         //check if sample passes Threshold
         float dst = i/resolution.x;
 
-        if(texCol.w > THRESHOLD) {
+        //if(texCol.w > THRESHOLD) {
             //set smallestDist
-            smallestDist = min(smallestDist, dst);
-        }
+            //smallestDist = min(smallestDist, dst);
+        //}
+
+        float val = 1-step(THRESHOLD, texCol.a);
+        smallestDist = max(min(smallestDist, dst), smallestDist*val);
+
     }
 
     fragColor = vec4(vec3(smallestDist), 1.0f);
