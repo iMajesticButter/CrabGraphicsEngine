@@ -27,15 +27,12 @@ namespace CrabEngine {
             /*!
               This number has a max value of 12 and a min value of 6!
             */
-            void setShadowResolution(unsigned res);
 
-            unsigned getShadowTextureResolution();
 
             CrabEngine::Math::Mat4 getViewMatrix();
 
         private:
 
-            unsigned m_shadowResolution;
 
         };
 

@@ -27,6 +27,7 @@ namespace CrabEngine {
         private:
 
             Window* m_window;
+            Texture* m_tex;
 
             GLuint m_fbo;
             GLuint m_rbo;

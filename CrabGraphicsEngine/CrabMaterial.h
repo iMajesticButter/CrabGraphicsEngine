@@ -59,6 +59,8 @@ namespace CrabEngine {
 
             void setUniformMat4(const std::string name, CrabEngine::Math::Mat4& mat);
 
+            friend void windowReset(void* context);
+
         private:
 
             std::vector<Shader> m_shaders;

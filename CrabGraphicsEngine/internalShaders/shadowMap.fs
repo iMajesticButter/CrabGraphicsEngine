@@ -4,6 +4,9 @@
 //     THIS SHADER IS USED BY THE RENDERER INTERNALLY, DO NOT MOVE OR MODIFY!!!!!!!!!!!!!!!!!!
 //--------------------------------------------------------------------------------------------------------
 
+//unroll the loop!
+#pragma optionNV (unroll all)
+
 #define PI 3.141
 
 in vec2 UV;
@@ -21,7 +24,7 @@ void main() {
 
     float smallestDist = 1.0;
 
-    for(float i = 0.0; i < resolution.x; i += 1.0) {
+    for(float i = 0.0; i < 1024; i += 1.0) {
         //polar to normal coordinates
         vec2 coord = vec2(cos(angle), sin(angle)) * (i/resolution.x);
         coord.x = (coord.x+1)/2;

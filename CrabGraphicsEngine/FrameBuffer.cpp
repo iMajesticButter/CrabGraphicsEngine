@@ -17,11 +17,11 @@ namespace CrabEngine {
         // Frame Buffer
         //----------------------------------------------------------
 
-        FrameBuffer::FrameBuffer(Window* window) : m_window(window) {
+        FrameBuffer::FrameBuffer(Window* window) : m_window(window), m_tex(nullptr), m_width(window->fbWidth()), m_height(window->fbHeight()) {
             windowInitEventCallback callback;
             callback.context  = this;
             callback.func = fbInitCallback;
-            m_window->registerInitFunc(callback);
+            m_window->registerInitFunc(callback, 1);
 
             Init();
 
@@ -31,8 +31,8 @@ namespace CrabEngine {
         }
 
         void FrameBuffer::Init() {
-            m_width = m_window->fbWidth();
-            m_height = m_window->fbHeight();
+            //m_width = m_window->fbWidth();
+            //m_height = m_window->fbHeight();
 
             //create the render bufffers (depth and stencil buffers)
             glGenRenderbuffers(1, &m_rbo);
@@ -43,11 +43,15 @@ namespace CrabEngine {
             glGenFramebuffers(1, &m_fbo);
             bind();
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+            if(m_tex != nullptr) {
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex->getTextureID(), 0);
+            }
             unbind();
         }
 
         void FrameBuffer::setTexture(Texture* tex) {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex->getTextureID(), 0);
+            m_tex = tex;
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex->getTextureID(), 0);
         }
 
         void FrameBuffer::resize(unsigned width, unsigned height) {

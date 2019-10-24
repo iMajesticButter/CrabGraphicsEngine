@@ -39,12 +39,12 @@ namespace CrabEngine{
         Renderer2D::Renderer2D(Window* window, CrabEngine::Math::Vec3 _ambientLight) : ambientLight(_ambientLight), m_window(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
                 m_screenSpaceImageFrag("./internalShaders/screenSpaceImage.fs"),
                 m_screenSpaceImageVert("./internalShaders/screenSpaceImage.vs"),
-                m_fbo(window),
-                m_fbo0(window),
-                m_fbo1(window),
                 m_tex0(*window),
                 m_tex1(*window),
                 m_ditherPattern(*window),
+                m_fbo(window),
+                m_fbo0(window),
+                m_fbo1(window),
                 m_shadowCasterTex(*window),
                 m_shadowCasterFBO(window),
                 m_shadowMapTex(*window),
@@ -86,19 +86,35 @@ namespace CrabEngine{
             m_fbo1.bind();
             m_fbo1.setTexture(&m_tex1);
 
+            const unsigned shadowRes = 1024;
+
             m_shadowCasterTex.setFilteringMode(LINEAR);
+            m_shadowCasterTex.setWidth(shadowRes);
+            m_shadowCasterTex.setHeight(shadowRes);
+            m_shadowCasterTex.setFormat(GL_RGBA);
+
             m_shadowCasterTex.Resize();
-            m_shadowCasterFBO.resize(1,1);
+            m_shadowCasterFBO.resize(shadowRes,shadowRes);
             m_shadowCasterFBO.bind();
             m_shadowCasterFBO.setTexture(&m_shadowCasterTex);
+
             m_shadowMapTex.setFilteringMode(LINEAR);
+            m_shadowMapTex.setWidth(shadowRes);
+            m_shadowMapTex.setHeight(1);
+            m_shadowMapTex.setFormat(GL_RGBA);
             m_shadowMapTex.Resize();
-            m_shadowMapFBO.resize(1,1);
+
+            m_shadowMapFBO.resize(shadowRes,1);
             m_shadowMapFBO.bind();
             m_shadowMapFBO.setTexture(&m_shadowMapTex);
+
             m_lightsTex.setFilteringMode(LINEAR);
+            m_lightsTex.setWidth(shadowRes);
+            m_lightsTex.setHeight(shadowRes);
+            m_lightsTex.setFormat(GL_RGBA);
             m_lightsTex.Resize();
-            m_lightFBO.resize(1,1);
+
+            m_lightFBO.resize(shadowRes,shadowRes);
             m_lightFBO.bind();
             m_lightFBO.setTexture(&m_lightsTex);
             m_lightFBO.unbind();
@@ -432,40 +448,10 @@ namespace CrabEngine{
 
                 glBlendFunc(GL_ONE, GL_ONE);
 
-                unsigned lres = 0;
+                unsigned res = 1024;
 
                 for(unsigned l = 0; l < m_lights.size(); ++l) {
-                    auto start = std::chrono::high_resolution_clock::now();
                     Light* light = m_lights[l];
-
-                    //unsigned res = light->getShadowTextureResolution();
-                    //res = 2048;
-
-                    unsigned res = lres;
-
-                    if(res != light->getShadowTextureResolution()) {
-
-                        if(light->castShadows || lres == 0) {
-                            res = light->getShadowTextureResolution();
-
-                            //render shadow casters to screen with light in the middle
-
-                            m_shadowCasterTex.setWidth(res);
-                            m_shadowCasterTex.setHeight(res);
-                            m_shadowCasterTex.setFormat(GL_RGBA);
-                            m_shadowCasterTex.Resize();
-                            m_shadowMapTex.setWidth(res);
-                            m_shadowMapTex.setHeight(1);
-                            m_shadowMapTex.setFormat(GL_RGBA);
-                            m_shadowMapTex.Resize();
-
-                            m_shadowCasterFBO.resize(res, res);
-                            m_shadowMapFBO.resize(res, 1);
-
-                        } else {
-                            res = lres;
-                        }
-                    }
 
                     m_shadowCasterFBO.bind();
 
@@ -495,7 +481,11 @@ namespace CrabEngine{
 
                             mat = obj->getMaterial();
                             //set object settings
-                            mat->bind();
+                            if(lastMat != mat) {
+                                if(lastMat != nullptr)
+                                    lastMat->unbind();
+                                mat->bind();
+                            }
                             obj->applyUniforms();
 
                             //get transformation matrix
@@ -519,9 +509,11 @@ namespace CrabEngine{
                             m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
                             indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
 
-                            mat->unbind();
+                            //mat->unbind();
                             lastMat = mat;
                         }
+                        if(lastMat != nullptr)
+                            lastMat->unbind();
                         m_vao->unbind();
                         m_ibo->unbind();
 
@@ -576,9 +568,6 @@ namespace CrabEngine{
                     m_lightMat.setUniformMat4("MVP", MVP);
 
                     drawPostEffectQuad(&m_shadowMapTex, &m_lightMat);
-
-                    std::chrono::duration<double> time = std::chrono::high_resolution_clock::now() - start;
-                    std::cout << time.count() << std::endl;
 
                 }
 
@@ -637,7 +626,11 @@ namespace CrabEngine{
                     mat = obj->getMaterial();
 
                     //set object settings
-                    mat->bind();
+                    if(lastMat != mat) {
+                        if(lastMat != nullptr)
+                            lastMat->unbind();
+                        mat->bind();
+                    }
                     obj->applyUniforms();
 
                     //get transformation matrix
@@ -661,10 +654,11 @@ namespace CrabEngine{
                     m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
                     indexOffset += obj->getMesh()->triangles.size() * sizeof(unsigned);
 
-                    mat->unbind();
+                    //mat->unbind();
                     lastMat = mat;
                 }
-
+                if(lastMat != nullptr)
+                    lastMat->unbind();
                 m_vao->unbind();
                 m_ibo->unbind();
 

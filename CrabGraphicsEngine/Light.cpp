@@ -6,16 +6,7 @@ namespace CrabEngine {
     namespace Graphics {
 
         Light::Light(CrabEngine::Math::Vec2 loc, CrabEngine::Math::Vec3 _color, float _falloff, float _intencity, float _size, float _softness, bool _castShadows) :
-            location(loc), color(_color), falloff(_falloff), intencity(_intencity), size(_size), softness(_softness), castShadows(_castShadows), active(true), m_shadowResolution(256) {
-        }
-
-        //! set the shadow resolution level, the shadow resolution will be 2 to the power of this number
-        void Light::setShadowResolution(unsigned res) {
-            m_shadowResolution = pow(2, std::max(6u, std::min(res, 12u)));
-        }
-
-        unsigned Light::getShadowTextureResolution() {
-            return m_shadowResolution;
+            location(loc), color(_color), falloff(_falloff), intencity(_intencity), size(_size), softness(_softness), castShadows(_castShadows), active(true) {
         }
 
         CrabEngine::Math::Mat4 Light::getViewMatrix() {

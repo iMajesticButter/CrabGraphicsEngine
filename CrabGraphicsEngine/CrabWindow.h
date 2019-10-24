@@ -14,6 +14,7 @@ namespace CrabEngine {
         struct windowInitEventCallback {
             void(*func)(void* context);
             void* context;
+            int priority = 0;
         };
 
         class Window {
@@ -22,7 +23,7 @@ namespace CrabEngine {
             Window(CrabEngine::Math::Vec2 resolution, std::string name, bool fullscreen, bool borderless, bool resizeable, bool vSync, unsigned MSAA);
             ~Window();
 
-            void registerInitFunc(const windowInitEventCallback& callback);
+            void registerInitFunc(windowInitEventCallback& callback, int priority = 0);
             void removeInitFunc(void* context);
 
             void update();

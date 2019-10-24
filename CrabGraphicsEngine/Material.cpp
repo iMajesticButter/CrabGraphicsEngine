@@ -5,6 +5,7 @@ namespace CrabEngine {
 
         //Window reset event
         void windowReset(void* context) {
+            ((Material*)context)->m_bound = false;
             if(((Material*)context)->isInitialized()) {
                 ((Material*)context)->Initialize();
             }
@@ -75,7 +76,7 @@ namespace CrabEngine {
                 //check Shader for Errors
             	glGetShaderiv(shaders[i], GL_COMPILE_STATUS, &Result);
             	glGetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &InfoLogLength);
-            	if ( InfoLogLength > 0 ){
+            	if ( InfoLogLength > 0 ) {
             		std::vector<char> ShaderErrorMessage(InfoLogLength+1);
             		glGetShaderInfoLog(shaders[i], InfoLogLength, NULL, &ShaderErrorMessage[0]);
                     printf("Shader Error:\n");

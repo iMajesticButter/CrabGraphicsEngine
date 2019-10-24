@@ -12,6 +12,7 @@
 #include "CrabLight.h"
 
 #include <vector>
+#include <iostream>
 
 int main() {
     using namespace CrabEngine::Graphics;
@@ -156,7 +157,6 @@ int main() {
     Light l;
     l.size = 2;
     l.softness = 8;
-    l.setShadowResolution(12);
     l.location = Vec2(1,1);
     l.castShadows = true;
     l.intencity = 1;
@@ -166,14 +166,36 @@ int main() {
     l2.color = Vec3(1,1,0);
     l2.castShadows = true;
     l2.location = Vec2(2,3);
-    l2.setShadowResolution(12);
 
     Renderer2D renderer(&window, Vec3(0,0,0));
 
     bool fullscreen = false;
     bool pressed = false;
 
+    //fps counter setup
+    auto last = std::chrono::high_resolution_clock::now();
+
+    const unsigned fpsSamples = 100;
+    unsigned sampleCount = 0;
+    float averageFPS = 0;
+
     while(!window.shouldClose()) {
+
+        //fps counter
+        std::chrono::duration<double> time = std::chrono::high_resolution_clock::now() - last;
+        float dt = time.count();
+        last = std::chrono::high_resolution_clock::now();
+
+        float fps = 1/dt;
+
+        ++sampleCount;
+        averageFPS += fps;
+        if(sampleCount >= fpsSamples) {
+            averageFPS /= fpsSamples;
+            sampleCount = 0;
+            std::cout << "Average FPS: " << averageFPS << std::endl;
+            averageFPS = 0;
+        }
 
         cam.location = PlayerPos;
         //player.location = PlayerPos;
@@ -190,6 +212,12 @@ int main() {
         }
 
         renderer.pushLight(&l);
+        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);
         renderer.pushLight(&l2);
 
         renderer.pushCamera(&cam);
