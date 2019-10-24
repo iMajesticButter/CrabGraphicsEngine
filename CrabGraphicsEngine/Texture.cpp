@@ -20,7 +20,7 @@ namespace CrabEngine {
         // Public Funcs
         //---------------------------------------
 
-        Texture::Texture(Window& window) : m_generated(false), m_window(&window), m_format(GL_RGBA), m_initialized(false), m_wrapMode(REPEAT), m_filterMode(NEAREST) {
+        Texture::Texture(Window& window, bool autoRefresh) : m_generated(false), m_window(&window), m_format(GL_RGBA), m_initialized(false), m_autoRefresh(autoRefresh), m_wrapMode(REPEAT), m_filterMode(NEAREST) {
         }
         Texture::~Texture() {
             if(m_initialized) {
@@ -84,7 +84,8 @@ namespace CrabEngine {
                 callback.context = this;
                 callback.func = TextureInitEvent;
 
-                m_window->registerInitFunc(callback);
+                if(m_autoRefresh)
+                    m_window->registerInitFunc(callback);
 
                 m_initialized = true;
             }
@@ -111,7 +112,8 @@ namespace CrabEngine {
                 callback.context = this;
                 callback.func = TextureInitEvent;
 
-                m_window->registerInitFunc(callback);
+                if(m_autoRefresh)
+                    m_window->registerInitFunc(callback);
 
                 m_initialized = true;
             }

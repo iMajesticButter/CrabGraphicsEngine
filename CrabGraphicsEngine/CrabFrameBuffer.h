@@ -15,7 +15,7 @@ namespace CrabEngine {
             FrameBuffer(Window* window);
             ~FrameBuffer();
 
-            void Init();
+            void Init(bool reset);
 
             void setTexture(Texture* tex);
 

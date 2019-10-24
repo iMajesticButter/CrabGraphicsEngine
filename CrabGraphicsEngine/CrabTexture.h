@@ -25,7 +25,7 @@ namespace CrabEngine {
 
         class Texture {
         public:
-            Texture(Window& window);
+            Texture(Window& window, bool autoRefresh = true);
             ~Texture();
 
             void setData(std::vector<unsigned char> data, unsigned width, unsigned height, GLenum format);
@@ -53,6 +53,7 @@ namespace CrabEngine {
             bool m_generated;
 
             friend void TextureInitEvent(void* context);
+            friend class FrameBuffer;
 
         private:
             std::vector<unsigned char> m_data;
@@ -60,6 +61,7 @@ namespace CrabEngine {
             GLuint m_texture, m_width, m_height;
             GLenum m_format;
             bool m_initialized;
+            bool m_autoRefresh;
 
             texWrapMode m_wrapMode;
             texFilterMode m_filterMode;

@@ -33,8 +33,7 @@ namespace CrabEngine {
             glfwTerminate();
         }
 
-        void Window::registerInitFunc(windowInitEventCallback& Callback, int priority) {
-            Callback.priority = priority;
+        void Window::registerInitFunc(windowInitEventCallback& Callback) {
             m_initFuncs.push_back(Callback);
         }
 
@@ -125,10 +124,6 @@ namespace CrabEngine {
             m_resizeable = resizeable;
         }
 
-        bool sortInitCallbacks(const windowInitEventCallback& l, const windowInitEventCallback& r) {
-            return l.priority < r.priority;
-        }
-
         void Window::initialize() {
 
             //if window already exists, destroy it and replace it with the new one
@@ -184,9 +179,6 @@ namespace CrabEngine {
 
             glfwMakeContextCurrent(m_window);
             glewInit();
-
-            //sort intiailize callback
-            std::sort(m_initFuncs.begin(), m_initFuncs.end(), sortInitCallbacks);
 
             //run intitialize callbacks
             for(unsigned i = 0; i < m_initFuncs.size(); ++i) {

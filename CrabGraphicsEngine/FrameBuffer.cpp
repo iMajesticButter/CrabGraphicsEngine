@@ -10,7 +10,7 @@ namespace CrabEngine {
         //----------------------------------------------------------
 
         void fbInitCallback(void* context) {
-            ((FrameBuffer*)context)->Init();
+            ((FrameBuffer*)context)->Init(true);
         }
 
         //----------------------------------------------------------
@@ -21,16 +21,16 @@ namespace CrabEngine {
             windowInitEventCallback callback;
             callback.context  = this;
             callback.func = fbInitCallback;
-            m_window->registerInitFunc(callback, 1);
+            m_window->registerInitFunc(callback);
 
-            Init();
+            Init(false);
 
         }
         FrameBuffer::~FrameBuffer() {
             m_window->removeInitFunc(this);
         }
 
-        void FrameBuffer::Init() {
+        void FrameBuffer::Init(bool reset) {
             //m_width = m_window->fbWidth();
             //m_height = m_window->fbHeight();
 
@@ -44,6 +44,9 @@ namespace CrabEngine {
             bind();
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
             if(m_tex != nullptr) {
+                if(reset)
+                    m_tex->m_generated = false;
+                m_tex->Resize();
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex->getTextureID(), 0);
             }
             unbind();
