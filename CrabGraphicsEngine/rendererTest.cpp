@@ -108,7 +108,7 @@ int main() {
     player.setTexture("tex", &mrKrabs);
     player.setUniform3f("tint", Vec3(1));
     player.renderLayer = 1;
-    player.castShadows = false;
+    player.castShadows = true;
 
     objects.push_back(&player);
 
@@ -165,6 +165,7 @@ int main() {
     Light l2;
     l2.color = Vec3(1,1,0);
     l2.castShadows = true;
+    l2.location = Vec2(2,3);
     l2.setShadowResolution(12);
 
     Renderer2D renderer(&window, Vec3(0,0,0));
@@ -192,7 +193,7 @@ int main() {
         renderer.pushLight(&l2);
 
         renderer.pushCamera(&cam);
-        renderer.pushCamera(&cam2);
+        //renderer.pushCamera(&cam2);
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
 
