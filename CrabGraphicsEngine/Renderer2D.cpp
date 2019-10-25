@@ -457,7 +457,7 @@ namespace CrabEngine{
 
                     if(light->castShadows) {
 
-                        m_lightFBO.setTexture(&m_shadowCasterTex);
+                        //m_lightFBO.setTexture(&m_shadowCasterTex);
                         glClear(GL_COLOR_BUFFER_BIT);
 
                         glViewport(0, 0, res, res);

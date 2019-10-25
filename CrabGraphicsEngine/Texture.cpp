@@ -1,6 +1,6 @@
 #include "CrabTexture.h"
 #include "CrabGraphicsUtils.h"
-
+#include <iostream>
 namespace CrabEngine {
     namespace Graphics {
 
@@ -12,7 +12,7 @@ namespace CrabEngine {
             if(((Texture*)context)->m_data.size() != 0) {
                 ((Texture*)context)->Init();
             } else {
-                ((Texture*)context)->Resize();
+                //((Texture*)context)->Resize();
             }
         }
 
@@ -103,6 +103,7 @@ namespace CrabEngine {
             glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, &m_data.front());
             glGenerateMipmap(GL_TEXTURE_2D);
 
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
 
@@ -133,6 +134,8 @@ namespace CrabEngine {
 
             glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_width, m_height, 0, m_format, GL_UNSIGNED_BYTE, NULL);
             glGenerateMipmap(GL_TEXTURE_2D);
+
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
 }
