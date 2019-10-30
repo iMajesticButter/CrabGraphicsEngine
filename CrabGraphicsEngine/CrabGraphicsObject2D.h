@@ -61,6 +61,8 @@ namespace CrabEngine {
             bool visible;
             bool castShadows;
 
+            CrabEngine::Math::Mat4 transformMatrix;
+
             GraphicsObject2D();
             GraphicsObject2D(Mesh* mesh, Material* mat);
 
@@ -75,6 +77,8 @@ namespace CrabEngine {
             graphicsObj2dTex getTexture(unsigned index);
             unsigned getTextureCount();
             void removeTexture(std::string name);
+
+            void calculateTransformMatrix();
 
             void applyUniforms();
 

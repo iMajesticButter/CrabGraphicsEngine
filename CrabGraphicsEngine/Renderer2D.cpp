@@ -347,6 +347,8 @@ namespace CrabEngine{
             unsigned offset = 0;
 
             for(unsigned i = 0; i < m_objects.size(); ++i) {
+                m_objects[i]->calculateTransformMatrix();
+
                 data = m_objects[i]->getMesh()->getVertexData();
 
                 //copy data to ibo
@@ -489,10 +491,12 @@ namespace CrabEngine{
                             obj->applyUniforms();
 
                             //get transformation matrix
-                            ScaleMatrix scaleMatrix(obj->scale);
+                            /*ScaleMatrix scaleMatrix(obj->scale);
                             RotationMatrix2D rotationMatrix(obj->rotation);
                             TranslationMatrix translationMatrix(obj->location);
-                            Mat4 MVP = projectionMatrix1to1 * lightMatrix * translationMatrix * rotationMatrix * scaleMatrix;
+                            Mat4 MVP = projectionMatrix1to1 * lightMatrix * translationMatrix * rotationMatrix * scaleMatrix;*/
+
+                            Mat4 MVP = projectionMatrix1to1 * lightMatrix * obj->transformMatrix;
 
                             //pass transformation matrix to vertex shader
                             mat->setUniformMat4("MVP", MVP);
@@ -634,10 +638,12 @@ namespace CrabEngine{
                     obj->applyUniforms();
 
                     //get transformation matrix
-                    ScaleMatrix scaleMatrix(obj->scale);
+                    /*ScaleMatrix scaleMatrix(obj->scale);
                     RotationMatrix2D rotationMatrix(obj->rotation);
                     TranslationMatrix translationMatrix(obj->location);
-                    Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;
+                    Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;*/
+
+                    Mat4 MVP = projectionMatrix * viewMatrix * obj->transformMatrix;
 
                     //pass transformation matrix to vertex shader
                     mat->setUniformMat4("MVP", MVP);

@@ -1,5 +1,6 @@
 #include <cstring>
 
+#include "CrabMat4.h"
 #include "CrabGraphicsObject2D.h"
 
 namespace CrabEngine {
@@ -113,6 +114,14 @@ namespace CrabEngine {
                     return;
                 }
             }
+        }
+
+        void GraphicsObject2D::calculateTransformMatrix() {
+            using namespace CrabEngine::Math;
+            ScaleMatrix scaleMatrix(scale);
+            RotationMatrix2D rotationMatrix(rotation);
+            TranslationMatrix translationMatrix(location);
+            transformMatrix = translationMatrix * rotationMatrix * scaleMatrix;
         }
 
         void GraphicsObject2D::applyUniforms() {
