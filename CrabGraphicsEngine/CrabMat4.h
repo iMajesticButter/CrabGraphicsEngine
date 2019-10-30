@@ -11,7 +11,7 @@ namespace CrabEngine {
         class Mat4 {
         public:
             //create identity matrix
-            Mat4();
+            Mat4(bool initialize = true);
             //copy constructor
             Mat4(const Mat4& other);
 

@@ -5,6 +5,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <cstring>
 
 namespace CrabEngine {
     namespace Math {
@@ -21,21 +22,27 @@ namespace CrabEngine {
         //-----------------------------------------
 
         //create identity matrix
-        Mat4::Mat4() {
-            for(int i = 0; i < 4*4; ++i) {
-                m_mat[i] = 0;
-            }
+        Mat4::Mat4(bool initialize) {
+            //for(int i = 0; i < 4*4; ++i) {
+            //    m_mat[i] = 0;
+            //}
 
-            m_mat[getIndex(0,0)] = 1;
-            m_mat[getIndex(1,1)] = 1;
-            m_mat[getIndex(2,2)] = 1;
-            m_mat[getIndex(3,3)] = 1;
+            if(!initialize)
+                return;
+
+            memset(m_mat, 0, sizeof(float) * (4*4));
+
+            m_mat[0] = 1;
+            m_mat[5] = 1;
+            m_mat[10] = 1;
+            m_mat[15] = 1;
         }
         //copy constructor
         Mat4::Mat4(const Mat4& other) {
-            for(int i = 0; i < 4*4; ++i) {
-                m_mat[i] = other.m_mat[i];
-            }
+            //for(int i = 0; i < 4*4; ++i) {
+            //    m_mat[i] = other.m_mat[i];
+            //}
+            memcpy(m_mat, other.m_mat, sizeof(float) * (4*4));
         }
 
         //getters
@@ -52,17 +59,40 @@ namespace CrabEngine {
 
         //operators
         Mat4 Mat4::operator*(const Mat4& other) {
-            Mat4 mat;
-            for(int i = 0; i < 4*4; ++i) {
-                mat.m_mat[i] = 0;
-            }
-            for(int i = 0; i < 4; ++i) {
-                for(int j = 0; j < 4; ++j) {
-                    for(int x = 0; x < 4; ++x) {
-                        mat.m_mat[getIndex(i,j)] += m_mat[getIndex(x,j)] * other.m_mat[getIndex(i,x)];
-                    }
+            Mat4 mat(false);
+            /*for(unsigned i = 0; i < 4; ++i) {
+                for(unsigned j = 0; j < 4; ++j) {
+                    //for(int x = 0; x < 4; ++x) {
+                    //    mat.m_mat[getIndex(i,j)] += m_mat[getIndex(x,j)] * other.m_mat[getIndex(i,x)];
+                    //}
+                    mat.m_mat[getIndex(i,j)] = m_mat[getIndex(0,j)] * other.m_mat[getIndex(i,0)]
+                                             + m_mat[getIndex(1,j)] * other.m_mat[getIndex(i,1)]
+                                             + m_mat[getIndex(2,j)] * other.m_mat[getIndex(i,2)]
+                                             + m_mat[getIndex(3,j)] * other.m_mat[getIndex(i,3)];
                 }
-            }
+            }*/
+
+            mat.m_mat[0] = m_mat[0] * other.m_mat[0] +   m_mat[1] * other.m_mat[4] +   m_mat[2] * other.m_mat[8] + m_mat[3] * other.m_mat[12];
+            mat.m_mat[1] = m_mat[0] * other.m_mat[1] +   m_mat[1] * other.m_mat[5] +   m_mat[2] * other.m_mat[9] + m_mat[3] * other.m_mat[13];
+            mat.m_mat[2] = m_mat[0] * other.m_mat[2] +   m_mat[1] * other.m_mat[6] +   m_mat[2] * other.m_mat[10] + m_mat[3] * other.m_mat[14];
+            mat.m_mat[3] = m_mat[0] * other.m_mat[3] +   m_mat[1] * other.m_mat[7] +   m_mat[2] * other.m_mat[11] + m_mat[3] * other.m_mat[15];
+
+            mat.m_mat[4] = m_mat[4] * other.m_mat[0] +   m_mat[5] * other.m_mat[4] +   m_mat[6] * other.m_mat[8] + m_mat[7] * other.m_mat[12];
+            mat.m_mat[5] = m_mat[4] * other.m_mat[1] +   m_mat[5] * other.m_mat[5] +   m_mat[6] * other.m_mat[9] + m_mat[7] * other.m_mat[13];
+            mat.m_mat[6] = m_mat[4] * other.m_mat[2] +   m_mat[5] * other.m_mat[6] +   m_mat[6] * other.m_mat[10] + m_mat[7] * other.m_mat[14];
+            mat.m_mat[7] = m_mat[4] * other.m_mat[3] +   m_mat[5] * other.m_mat[7] +   m_mat[6] * other.m_mat[11] + m_mat[7] * other.m_mat[15];
+
+            mat.m_mat[8] = m_mat[8] * other.m_mat[0] +   m_mat[9] * other.m_mat[4] +   m_mat[10] * other.m_mat[8] + m_mat[11] * other.m_mat[12];
+            mat.m_mat[9] = m_mat[8] * other.m_mat[1] +   m_mat[9] * other.m_mat[5] +   m_mat[10] * other.m_mat[9] + m_mat[11] * other.m_mat[13];
+            mat.m_mat[10] = m_mat[8] * other.m_mat[2] +   m_mat[9] * other.m_mat[6] +   m_mat[10] * other.m_mat[10] + m_mat[11] * other.m_mat[14];
+            mat.m_mat[11] = m_mat[8] * other.m_mat[3] +   m_mat[9] * other.m_mat[7] +   m_mat[10] * other.m_mat[11] + m_mat[11] * other.m_mat[15];
+
+            mat.m_mat[12] = m_mat[12] * other.m_mat[0] +   m_mat[13] * other.m_mat[4] +   m_mat[14] * other.m_mat[8] + m_mat[15] * other.m_mat[12];
+            mat.m_mat[13] = m_mat[12] * other.m_mat[1] +   m_mat[13] * other.m_mat[5] +   m_mat[14] * other.m_mat[9] + m_mat[15] * other.m_mat[13];
+            mat.m_mat[14] = m_mat[12] * other.m_mat[2] +   m_mat[13] * other.m_mat[6] +   m_mat[14] * other.m_mat[10] + m_mat[15] * other.m_mat[14];
+            mat.m_mat[15] = m_mat[12] * other.m_mat[3] +   m_mat[13] * other.m_mat[7] +   m_mat[14] * other.m_mat[11] + m_mat[15] * other.m_mat[15];
+
+
             return mat;
         }
         Mat4& Mat4::operator*=(const Mat4& other) {
@@ -70,9 +100,10 @@ namespace CrabEngine {
             return *this;
         }
         Mat4& Mat4::operator=(const Mat4& other) {
-            for(int i = 0; i < 4*4; ++i) {
-                m_mat[i] = other.m_mat[i];
-            }
+            //for(int i = 0; i < 4*4; ++i) {
+            //    m_mat[i] = other.m_mat[i];
+            //}
+            memcpy(m_mat, other.m_mat, sizeof(float) * (4*4));
             return *this;
         }
 

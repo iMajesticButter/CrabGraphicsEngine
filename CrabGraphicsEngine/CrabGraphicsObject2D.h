@@ -5,6 +5,7 @@
 #include "CrabVec2.h"
 #include "CrabTexture.h"
 #include "CrabMaterial.h"
+#include "CrabMat4.h"
 
 #include <vector>
 #include <string>
@@ -35,7 +36,7 @@ namespace CrabEngine {
 
             graphicsObj2dUniform& operator=(const graphicsObj2dUniform& other);
 
-            std::string getName();
+            std::string* getName();
             unsigned getSize();
             graphicsObj2dUniformType getType();
             void* getData();
@@ -80,6 +81,8 @@ namespace CrabEngine {
 
             void calculateTransformMatrix();
 
+            bool texturesEqual(const GraphicsObject2D& other) const;
+
             void applyUniforms();
 
             void setUniform1f(std::string name, float data);
@@ -93,6 +96,18 @@ namespace CrabEngine {
             void setUniformMat4(std::string name, CrabEngine::Math::Mat4 data);
 
         private:
+
+            //old loc/rot/scale to detect if they have changed
+            CrabEngine::Math::Vec3 m_OLDlocation;
+            CrabEngine::Math::Vec2 m_OLDscale;
+
+            //matrix components
+            CrabEngine::Math::Mat4 m_transMat;
+            CrabEngine::Math::Mat4 m_rotMat;
+            CrabEngine::Math::Mat4 m_scaleMat;
+
+            //! rotation in radians
+            float m_OLDrotation;
 
             void pushUniform(graphicsObj2dUniform uniform);
 

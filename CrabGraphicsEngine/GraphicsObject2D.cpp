@@ -1,6 +1,5 @@
 #include <cstring>
 
-#include "CrabMat4.h"
 #include "CrabGraphicsObject2D.h"
 
 namespace CrabEngine {
@@ -41,8 +40,8 @@ namespace CrabEngine {
             return *this;
         }
 
-        std::string graphicsObj2dUniform::getName() {
-            return m_name;
+        std::string* graphicsObj2dUniform::getName() {
+            return &m_name;
         }
         unsigned graphicsObj2dUniform::getSize() {
             return m_size;
@@ -118,10 +117,44 @@ namespace CrabEngine {
 
         void GraphicsObject2D::calculateTransformMatrix() {
             using namespace CrabEngine::Math;
-            ScaleMatrix scaleMatrix(scale);
-            RotationMatrix2D rotationMatrix(rotation);
-            TranslationMatrix translationMatrix(location);
-            transformMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+
+            bool changed = false;
+
+            if(m_OLDscale != scale) {
+                m_scaleMat = ScaleMatrix(scale);
+                changed = true;
+                m_OLDscale = scale;
+            }
+            if(m_OLDrotation != rotation) {
+                m_rotMat = RotationMatrix2D(rotation);
+                changed = true;
+                m_OLDrotation = rotation;
+            }
+            if(m_OLDlocation != location) {
+                m_transMat = TranslationMatrix(location);
+                changed = true;
+                m_OLDlocation = location;
+            }
+
+            if(!changed)
+                return;
+
+            transformMatrix = m_transMat * m_rotMat * m_scaleMat;
+        }
+
+        bool GraphicsObject2D::texturesEqual(const GraphicsObject2D& other) const {
+
+            if(m_textures.size() != other.m_textures.size()) {
+                return false;
+            }
+
+            for(unsigned i = 0; i < m_textures.size(); ++i) {
+                if(m_textures[i].tex != other.m_textures[i].tex ||
+                   m_textures[i].name != other.m_textures[i].name) {
+                       return false;
+                }
+            }
+            return true;
         }
 
         void GraphicsObject2D::applyUniforms() {
@@ -129,29 +162,30 @@ namespace CrabEngine {
             using namespace CrabEngine::Math;
 
             for(unsigned i = 0; i < m_uniforms.size(); ++i) {
-                std::string name = m_uniforms[i].getName();
+                std::string* name = m_uniforms[i].getName();
                 void* data = m_uniforms[i].getData();
+
                 switch(m_uniforms[i].getType()) {
                 case float1:
-                    m_material->setUniform1f(name, *((float*)data));
+                    m_material->setUniform1f(*name, *((float*)data));
                     break;
                 case float2:
-                    m_material->setUniform2f(name, *((Vec2*)data));
+                    m_material->setUniform2f(*name, *((Vec2*)data));
                     break;
                 case float3:
-                    m_material->setUniform3f(name, *((Vec3*)data));
+                    m_material->setUniform3f(*name, *((Vec3*)data));
                     break;
                 case float4:
-                    m_material->setUniform4f(name, *((Vec4*)data));
+                    m_material->setUniform4f(*name, *((Vec4*)data));
                     break;
                 case int1:
-                    m_material->setUniform1i(name, *((int*)data));
+                    m_material->setUniform1i(*name, *((int*)data));
                     break;
                 case double1:
-                    m_material->setUniform1d(name, *((double*)data));
+                    m_material->setUniform1d(*name, *((double*)data));
                     break;
                 case mat4:
-                    m_material->setUniformMat4(name, *((Mat4*)data));
+                    m_material->setUniformMat4(*name, *((Mat4*)data));
                     break;
                 default:
                     break;
@@ -191,9 +225,9 @@ namespace CrabEngine {
         //------------------------------------------
 
         void GraphicsObject2D::pushUniform(graphicsObj2dUniform uniform) {
-            std::string name = uniform.getName();
+            std::string* name = uniform.getName();
             for(unsigned i = 0; i < m_uniforms.size(); ++i) {
-                if(m_uniforms[i].getName() == name) {
+                if(*m_uniforms[i].getName() == *name) {
                     m_uniforms[i] = uniform;
                     return;
                 }

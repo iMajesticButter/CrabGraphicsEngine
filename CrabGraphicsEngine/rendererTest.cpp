@@ -183,10 +183,10 @@ int main() {
 
         //fps counter
         std::chrono::duration<double> time = std::chrono::high_resolution_clock::now() - last;
-        float dt = time.count();
+        double dt = time.count();
         last = std::chrono::high_resolution_clock::now();
 
-        float fps = 1/dt;
+        double fps = 1/dt;
 
         ++sampleCount;
         averageFPS += fps;
@@ -207,6 +207,7 @@ int main() {
 
         renderer.start();
 
+
         for(unsigned i = 0; i < objects.size(); ++i) {
             renderer.pushObject(objects[i]);
         }
@@ -224,7 +225,6 @@ int main() {
         //renderer.pushCamera(&cam2);
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
-
         renderer.end();
 
         if(window.keyDown(GLFW_KEY_W)) {

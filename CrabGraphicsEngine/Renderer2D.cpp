@@ -370,6 +370,8 @@ namespace CrabEngine{
             m_ibo->setData(m_numIndecies, iboData);
             m_vbo->setData(sizeof(GLfloat) * (m_numVertecies*4), vboData);
 
+
+
             delete[] iboData;
             delete[] vboData;
 
@@ -470,6 +472,7 @@ namespace CrabEngine{
 
                         Material* lastMat = nullptr;
                         Material* mat = nullptr;
+                        GraphicsObject2D* lastObj = nullptr;
 
                         //draw all shadow casters to shadowCasterTex centered on the light position
                         indexOffset = 0;
@@ -496,7 +499,7 @@ namespace CrabEngine{
                             TranslationMatrix translationMatrix(obj->location);
                             Mat4 MVP = projectionMatrix1to1 * lightMatrix * translationMatrix * rotationMatrix * scaleMatrix;*/
 
-                            Mat4 MVP = projectionMatrix1to1 * lightMatrix * obj->transformMatrix;
+                            Mat4 MVP(projectionMatrix1to1 * lightMatrix * obj->transformMatrix);
 
                             //pass transformation matrix to vertex shader
                             mat->setUniformMat4("MVP", MVP);
@@ -505,9 +508,11 @@ namespace CrabEngine{
                             }
 
                             //set object textures
-                            for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
-                                obj->getTexture(j).tex->bind(j);
-                                mat->setUniform1i(obj->getTexture(j).name, j);
+                            if(lastObj == nullptr || !obj->texturesEqual(*lastObj)) {
+                                for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
+                                    obj->getTexture(j).tex->bind(j);
+                                    mat->setUniform1i(obj->getTexture(j).name, j);
+                                }
                             }
 
                             m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
@@ -515,6 +520,7 @@ namespace CrabEngine{
 
                             //mat->unbind();
                             lastMat = mat;
+                            lastObj = obj;
                         }
                         if(lastMat != nullptr)
                             lastMat->unbind();
@@ -623,6 +629,9 @@ namespace CrabEngine{
 
                 Material* lastMat = nullptr;
                 Material* mat = nullptr;
+                GraphicsObject2D* lastObj = nullptr;
+
+                auto start = std::chrono::high_resolution_clock::now();
 
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
                     GraphicsObject2D* obj = m_objects[o];
@@ -643,7 +652,7 @@ namespace CrabEngine{
                     TranslationMatrix translationMatrix(obj->location);
                     Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix * scaleMatrix;*/
 
-                    Mat4 MVP = projectionMatrix * viewMatrix * obj->transformMatrix;
+                    Mat4 MVP(projectionMatrix * viewMatrix * obj->transformMatrix);
 
                     //pass transformation matrix to vertex shader
                     mat->setUniformMat4("MVP", MVP);
@@ -652,9 +661,11 @@ namespace CrabEngine{
                     }
 
                     //set object textures
-                    for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
-                        obj->getTexture(j).tex->bind(j);
-                        mat->setUniform1i(obj->getTexture(j).name, j);
+                    if(lastObj == nullptr || !obj->texturesEqual(*lastObj)) {
+                        for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
+                            obj->getTexture(j).tex->bind(j);
+                            mat->setUniform1i(obj->getTexture(j).name, j);
+                        }
                     }
 
                     m_vao->draw(obj->getMesh()->triangles.size(), indexOffset);
@@ -662,11 +673,15 @@ namespace CrabEngine{
 
                     //mat->unbind();
                     lastMat = mat;
+                    lastObj = obj;
                 }
                 if(lastMat != nullptr)
                     lastMat->unbind();
                 m_vao->unbind();
                 m_ibo->unbind();
+
+                std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
+                //std::cout << t.count() << std::endl;
 
                 //do post processing effects
 
