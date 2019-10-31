@@ -11,9 +11,9 @@ namespace CrabEngine {
             }
         }
 
-        //-------------------------
+        //--------------------------------------------------------------------------------------------
         // Public Funcs
-        //-------------------------
+        //--------------------------------------------------------------------------------------------
 
         Material::Material(Window& window, const std::string name) : m_initialized(false), m_bound(false) {
             m_name = name;
@@ -58,6 +58,9 @@ namespace CrabEngine {
         }
 
         void Material::Initialize() {
+
+            m_locationCache.clear();
+
             //error vars
             GLint Result = GL_FALSE;
             int InfoLogLength;
@@ -140,7 +143,7 @@ namespace CrabEngine {
         void Material::setUniform1i  (const std::string name, const int val) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform1i(uniformPointer, val);
             }
@@ -150,7 +153,7 @@ namespace CrabEngine {
         void Material::setUniform1ui (const std::string name, const unsigned val) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform1ui(uniformPointer, val);
             }
@@ -160,7 +163,7 @@ namespace CrabEngine {
         void Material::setUniform1f  (const std::string name, const float val) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform1f(uniformPointer, val);
             }
@@ -170,7 +173,7 @@ namespace CrabEngine {
         void Material::setUniform1d  (const std::string name, const double val) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform1d(uniformPointer, val);
             }
@@ -182,7 +185,7 @@ namespace CrabEngine {
         void Material::setUniform2i  (const std::string name, const int val1,      const int val2) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform2i(uniformPointer, val1, val2);
             }
@@ -192,7 +195,7 @@ namespace CrabEngine {
         void Material::setUniform2ui (const std::string name, const unsigned val1, const unsigned val2) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform2ui(uniformPointer, val1, val2);
             }
@@ -202,7 +205,7 @@ namespace CrabEngine {
         void Material::setUniform2f  (const std::string name, const float val1,    const float val2) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform2f(uniformPointer, val1, val2);
             }
@@ -212,7 +215,7 @@ namespace CrabEngine {
         void Material::setUniform2d  (const std::string name, const double val1,   const double val2) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform2d(uniformPointer, val1, val2);
             }
@@ -223,7 +226,7 @@ namespace CrabEngine {
         void Material::setUniform3i  (const std::string name, const int val1,      const int val2,      const int val3) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform3i(uniformPointer, val1, val2, val3);
             }
@@ -233,7 +236,7 @@ namespace CrabEngine {
         void Material::setUniform3ui (const std::string name, const unsigned val1, const unsigned val2, const unsigned val3) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform3ui(uniformPointer, val1, val2, val3);
             }
@@ -243,7 +246,7 @@ namespace CrabEngine {
         void Material::setUniform3f  (const std::string name, const float val1,    const float val2,    const float val3) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform3f(uniformPointer, val1, val2, val3);
             }
@@ -253,7 +256,7 @@ namespace CrabEngine {
         void Material::setUniform3d  (const std::string name, const double val1,   const double val2,   const double val3) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform3d(uniformPointer, val1, val2, val3);
             }
@@ -264,7 +267,7 @@ namespace CrabEngine {
         void Material::setUniform4i  (const std::string name, const int val1,      const int val2,      const int val3,      const int val4) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform4i(uniformPointer, val1, val2, val3, val4);
             }
@@ -274,7 +277,7 @@ namespace CrabEngine {
         void Material::setUniform4ui (const std::string name, const unsigned val1, const unsigned val2, const unsigned val3, const unsigned val4) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform4ui(uniformPointer, val1, val2, val3, val4);
             }
@@ -284,7 +287,7 @@ namespace CrabEngine {
         void Material::setUniform4f  (const std::string name, const float val1,    const float val2,    const float val3,    const float val4) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform4f(uniformPointer, val1, val2, val3, val4);
             }
@@ -294,7 +297,7 @@ namespace CrabEngine {
         void Material::setUniform4d  (const std::string name, const double val1,   const double val2,   const double val3,   const double val4) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform4d(uniformPointer, val1, val2, val3, val4);
             }
@@ -305,7 +308,7 @@ namespace CrabEngine {
         void Material::setUniform2f  (const std::string name, const CrabEngine::Math::Vec2& vec) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform2f(uniformPointer, vec.x, vec.y);
             }
@@ -315,7 +318,7 @@ namespace CrabEngine {
         void Material::setUniform3f  (const std::string name, const CrabEngine::Math::Vec3& vec) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform3f(uniformPointer, vec.x, vec.y, vec.z);
             }
@@ -325,7 +328,7 @@ namespace CrabEngine {
         void Material::setUniform4f  (const std::string name, const CrabEngine::Math::Vec4& vec) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniform4f(uniformPointer, vec.x, vec.y, vec.z, vec.w);
             }
@@ -336,7 +339,7 @@ namespace CrabEngine {
         void Material::setUniformMat4(const std::string name, CrabEngine::Math::Mat4& mat) {
             if(!m_bound)
                 glUseProgram(m_program);
-            GLint uniformPointer = glGetUniformLocation(m_program, name.c_str());
+            GLint uniformPointer = GetUniformLocation(name);
             if(uniformPointer != -1) {
                 glUniformMatrix4fv(uniformPointer, 1, GL_TRUE, mat.begin());
             }
@@ -344,5 +347,28 @@ namespace CrabEngine {
                 glUseProgram(0);
         }
 
+
+
+        //--------------------------------------------------------------------------------------------
+        // Private Funcs
+        //--------------------------------------------------------------------------------------------
+
+
+        GLint Material::GetUniformLocation(const std::string& name) const {
+            //return glGetUniformLocation(m_program, name.c_str());
+            for(unsigned i = 0; i < m_locationCache.size(); ++i) {
+                if(m_locationCache[i].name == name) {
+                    return m_locationCache[i].location;
+                }
+            }
+
+            GLint loc = glGetUniformLocation(m_program, name.c_str());
+
+            Uniform uniform;
+            uniform.name = name;
+            uniform.location = loc;
+            m_locationCache.emplace_back(uniform);
+            return loc;
+        }
     }
 }

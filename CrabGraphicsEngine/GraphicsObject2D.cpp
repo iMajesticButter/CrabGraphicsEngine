@@ -232,7 +232,7 @@ namespace CrabEngine {
                     return;
                 }
             }
-            m_uniforms.push_back(uniform);
+            m_uniforms.emplace_back(uniform);
         }
 
     }

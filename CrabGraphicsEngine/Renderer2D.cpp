@@ -288,13 +288,13 @@ namespace CrabEngine{
             }
 
             if(cam->active) {
-                m_cams.push_back(cam);
+                m_cams.emplace_back(cam);
             }
 
         }
         void Renderer2D::pushLight(Light* light) {
             if(light->active) {
-                m_lights.push_back(light);
+                m_lights.emplace_back(light);
             }
         }
         void Renderer2D::pushObject(GraphicsObject2D* obj) {
@@ -304,7 +304,7 @@ namespace CrabEngine{
             }
 
             if(obj->visible && obj->getMesh() != nullptr && obj->getMaterial() != nullptr) {
-                m_objects.push_back(obj);
+                m_objects.emplace_back(obj);
 
                 m_numVertecies += obj->getMesh()->vertecies.size();
                 m_numIndecies += obj->getMesh()->triangles.size();
@@ -346,25 +346,32 @@ namespace CrabEngine{
 
             unsigned offset = 0;
 
+            //auto start = std::chrono::high_resolution_clock::now();
+
             for(unsigned i = 0; i < m_objects.size(); ++i) {
                 m_objects[i]->calculateTransformMatrix();
 
-                data = m_objects[i]->getMesh()->getVertexData();
+                //data = m_objects[i]->getMesh()->getVertexData();
 
                 //copy data to ibo
-                for(unsigned j = 0; j < m_objects[i]->getMesh()->triangles.size(); ++j) {
+                /*for(unsigned j = 0; j < m_objects[i]->getMesh()->triangles.size(); ++j) {
                     *(iboDataIterator + j) = m_objects[i]->getMesh()->triangles[j] + offset;
                 }
                 iboDataIterator += m_objects[i]->getMesh()->triangles.size();
-                offset += m_objects[i]->getMesh()->vertecies.size();
+                offset += m_objects[i]->getMesh()->vertecies.size();*/
+                m_objects[i]->getMesh()->copyIndexDataToPointer(iboDataIterator, offset);
 
                 //copy data to vbo
-                memcpy(vboDataIterator, &data.front(), sizeof(GLfloat) * data.size());
-                vboDataIterator += data.size();
+                //memcpy(vboDataIterator, &data.front(), sizeof(GLfloat) * data.size());
+                //vboDataIterator += data.size();
+                m_objects[i]->getMesh()->copyVertexDataToPointer(vboDataIterator);
 
             }
             iboDataIterator = nullptr;
             vboDataIterator = nullptr;
+
+            //std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
+            //std::cout << t.count() << std::endl;
 
             //push data to ibo and vbo
             m_ibo->setData(m_numIndecies, iboData);
@@ -631,8 +638,6 @@ namespace CrabEngine{
                 Material* mat = nullptr;
                 GraphicsObject2D* lastObj = nullptr;
 
-                auto start = std::chrono::high_resolution_clock::now();
-
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
                     GraphicsObject2D* obj = m_objects[o];
 
@@ -679,9 +684,6 @@ namespace CrabEngine{
                     lastMat->unbind();
                 m_vao->unbind();
                 m_ibo->unbind();
-
-                std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
-                //std::cout << t.count() << std::endl;
 
                 //do post processing effects
 

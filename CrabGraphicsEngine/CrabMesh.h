@@ -23,6 +23,8 @@ namespace CrabEngine {
             Mesh();
 
             std::vector<GLfloat> getVertexData();
+            void copyVertexDataToPointer(float*& start);
+            void copyIndexDataToPointer(unsigned*& start, unsigned& offset);
 
             VBOlayout getLayout();
 

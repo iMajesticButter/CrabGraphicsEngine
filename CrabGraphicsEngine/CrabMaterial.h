@@ -16,6 +16,11 @@
 namespace CrabEngine {
     namespace Graphics {
 
+        struct Uniform {
+            std::string name;
+            GLint location;
+        };
+
         class Material {
         public:
 
@@ -63,6 +68,9 @@ namespace CrabEngine {
 
         private:
 
+            GLint GetUniformLocation(const std::string& name) const;
+
+            mutable std::vector<Uniform> m_locationCache;
             std::vector<Shader> m_shaders;
 
             Window* m_window;
