@@ -114,8 +114,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 10;
-    const int h = 10;
+    const int w = 100;
+    const int h = 100;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -212,14 +212,14 @@ int main() {
             renderer.pushObject(objects[i]);
         }
 
-        renderer.pushLight(&l);
+        /*renderer.pushLight(&l);
         renderer.pushLight(&l2);
         renderer.pushLight(&l2);
         renderer.pushLight(&l2);
         renderer.pushLight(&l2);
         renderer.pushLight(&l2);
         renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
+        renderer.pushLight(&l2);*/
 
         renderer.pushCamera(&cam);
         //renderer.pushCamera(&cam2);

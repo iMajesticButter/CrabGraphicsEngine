@@ -162,30 +162,30 @@ namespace CrabEngine {
             using namespace CrabEngine::Math;
 
             for(unsigned i = 0; i < m_uniforms.size(); ++i) {
-                std::string* name = m_uniforms[i].getName();
+                const char* name = m_uniforms[i].getName()->c_str();
                 void* data = m_uniforms[i].getData();
 
                 switch(m_uniforms[i].getType()) {
                 case float1:
-                    m_material->setUniform1f(*name, *((float*)data));
+                    m_material->setUniform1f(name, *((float*)data));
                     break;
                 case float2:
-                    m_material->setUniform2f(*name, *((Vec2*)data));
+                    m_material->setUniform2f(name, *((Vec2*)data));
                     break;
                 case float3:
-                    m_material->setUniform3f(*name, *((Vec3*)data));
+                    m_material->setUniform3f(name, *((Vec3*)data));
                     break;
                 case float4:
-                    m_material->setUniform4f(*name, *((Vec4*)data));
+                    m_material->setUniform4f(name, *((Vec4*)data));
                     break;
                 case int1:
-                    m_material->setUniform1i(*name, *((int*)data));
+                    m_material->setUniform1i(name, *((int*)data));
                     break;
                 case double1:
-                    m_material->setUniform1d(*name, *((double*)data));
+                    m_material->setUniform1d(name, *((double*)data));
                     break;
                 case mat4:
-                    m_material->setUniformMat4(*name, *((Mat4*)data));
+                    m_material->setUniformMat4(name, *((Mat4*)data));
                     break;
                 default:
                     break;
