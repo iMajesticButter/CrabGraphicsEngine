@@ -361,7 +361,6 @@ namespace CrabEngine {
                     return m_locationCache[i].location;
                 }
             }
-
             GLint loc = glGetUniformLocation(m_program, name.data());
 
             Uniform uniform;

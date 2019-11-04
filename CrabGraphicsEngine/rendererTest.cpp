@@ -114,8 +114,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 100;
-    const int h = 100;
+    const int w = 10;
+    const int h = 10;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -193,7 +193,7 @@ int main() {
         if(sampleCount >= fpsSamples) {
             averageFPS /= fpsSamples;
             sampleCount = 0;
-            std::cout << "Average FPS: " << averageFPS << std::endl;
+            //std::cout << "Average FPS: " << averageFPS << std::endl;
             averageFPS = 0;
         }
 

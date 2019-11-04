@@ -1,5 +1,7 @@
 //#include "GLEW/glew.h"
 
+#define PROFILEING_MODE 2
+
 #include "CrabRenderer2D.h"
 #include "CrabGraphicsObject2D.h"
 #include "CrabCamera.h"
@@ -346,7 +348,9 @@ namespace CrabEngine{
 
             unsigned offset = 0;
 
-            //auto start = std::chrono::high_resolution_clock::now();
+        #if PROFILEING_MODE == 1
+            auto start = std::chrono::high_resolution_clock::now();
+        #endif
 
             for(unsigned i = 0; i < m_objects.size(); ++i) {
                 m_objects[i]->calculateTransformMatrix();
@@ -370,8 +374,10 @@ namespace CrabEngine{
             iboDataIterator = nullptr;
             vboDataIterator = nullptr;
 
-            //std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
-            //std::cout << t.count() << std::endl;
+        #if PROFILEING_MODE == 1
+            std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
+            std::cout << t.count() << std::endl;
+        #endif
 
             //push data to ibo and vbo
             m_ibo->setData(m_numIndecies, iboData);
@@ -638,6 +644,10 @@ namespace CrabEngine{
                 Material* mat = nullptr;
                 GraphicsObject2D* lastObj = nullptr;
 
+                #if PROFILEING_MODE == 2
+                    auto start = std::chrono::high_resolution_clock::now();
+                #endif
+
                 for(unsigned o = 0; o < m_objects.size(); ++o) {
                     GraphicsObject2D* obj = m_objects[o];
 
@@ -684,6 +694,11 @@ namespace CrabEngine{
                     lastMat->unbind();
                 m_vao->unbind();
                 m_ibo->unbind();
+
+                #if PROFILEING_MODE == 2
+                    std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - start;
+                    std::cout << t.count() << std::endl;
+                #endif
 
                 //do post processing effects
 

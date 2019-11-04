@@ -1,4 +1,5 @@
 #include <cstring>
+#include <string_view>
 
 #include "CrabGraphicsObject2D.h"
 
@@ -162,7 +163,7 @@ namespace CrabEngine {
             using namespace CrabEngine::Math;
 
             for(unsigned i = 0; i < m_uniforms.size(); ++i) {
-                const char* name = m_uniforms[i].getName()->c_str();
+                const std::string_view name = *m_uniforms[i].getName();
                 void* data = m_uniforms[i].getData();
 
                 switch(m_uniforms[i].getType()) {
