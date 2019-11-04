@@ -109,18 +109,18 @@ namespace CrabEngine {
 
         Vec4 Mat4::operator*(const Vec4& other) {
             Vec4 out;
-            out.x = m_mat[getIndex(0,0)]*other.x + m_mat[getIndex(1,0)]*other.y + m_mat[getIndex(2,0)]*other.z + m_mat[getIndex(3,0)]*other.w;
-            out.y = m_mat[getIndex(0,1)]*other.x + m_mat[getIndex(1,1)]*other.y + m_mat[getIndex(2,1)]*other.z + m_mat[getIndex(3,1)]*other.w;
-            out.z = m_mat[getIndex(0,2)]*other.x + m_mat[getIndex(1,2)]*other.y + m_mat[getIndex(2,2)]*other.z + m_mat[getIndex(3,2)]*other.w;
-            out.w = m_mat[getIndex(0,3)]*other.x + m_mat[getIndex(1,3)]*other.y + m_mat[getIndex(2,3)]*other.z + m_mat[getIndex(3,3)]*other.w;
+            out.x = m_mat[0]*other.x + m_mat[1]*other.y + m_mat[2]*other.z + m_mat[3]*other.w;
+            out.y = m_mat[4]*other.x + m_mat[5]*other.y + m_mat[6]*other.z + m_mat[7]*other.w;
+            out.z = m_mat[8]*other.x + m_mat[9]*other.y + m_mat[10]*other.z + m_mat[11]*other.w;
+            out.w = m_mat[12]*other.x + m_mat[13]*other.y + m_mat[14]*other.z + m_mat[15]*other.w;
             return out;
         }
 
         Vec3 Mat4::operator*(const Vec3& other) {
             Vec3 out;
-            out.x = m_mat[getIndex(0,0)]*other.x + m_mat[getIndex(1,0)]*other.y + m_mat[getIndex(2,0)]*other.z + m_mat[getIndex(3,0)];
-            out.y = m_mat[getIndex(0,1)]*other.x + m_mat[getIndex(1,1)]*other.y + m_mat[getIndex(2,1)]*other.z + m_mat[getIndex(3,1)];
-            out.z = m_mat[getIndex(0,2)]*other.x + m_mat[getIndex(1,2)]*other.y + m_mat[getIndex(2,2)]*other.z + m_mat[getIndex(3,2)];
+            out.x = m_mat[0]*other.x + m_mat[1]*other.y + m_mat[2]*other.z + m_mat[3];
+            out.y = m_mat[4]*other.x + m_mat[5]*other.y + m_mat[6]*other.z + m_mat[7];
+            out.z = m_mat[8]*other.x + m_mat[9]*other.y + m_mat[10]*other.z + m_mat[11];
             return out;
         }
 

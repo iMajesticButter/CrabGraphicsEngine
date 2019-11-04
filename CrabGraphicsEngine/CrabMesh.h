@@ -20,11 +20,14 @@ namespace CrabEngine {
 
             std::vector<unsigned int> triangles;
 
+            CrabEngine::Math::Vec4 boundingBox;
+
             Mesh();
 
             std::vector<GLfloat> getVertexData();
             void copyVertexDataToPointer(float*& start);
             void copyIndexDataToPointer(unsigned*& start, unsigned& offset);
+            void calculateBoundingBox();
 
             VBOlayout getLayout();
 

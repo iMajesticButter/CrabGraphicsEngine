@@ -355,6 +355,8 @@ namespace CrabEngine{
             for(unsigned i = 0; i < m_objects.size(); ++i) {
                 m_objects[i]->calculateTransformMatrix();
 
+                //TODO: view frustum culling
+
                 //data = m_objects[i]->getMesh()->getVertexData();
 
                 //copy data to ibo
@@ -470,6 +472,32 @@ namespace CrabEngine{
                 for(unsigned l = 0; l < m_lights.size(); ++l) {
                     Light* light = m_lights[l];
 
+                    ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*(30.0f/11));
+                    TranslationMatrix translationMatrix(Vec4(light->location, 0.0, 1.0));
+                    Mat4 MVP(projectionMatrix * viewMatrix * translationMatrix * scaleMatrix);
+
+                    //------cull light if it is out of the view frustum------
+
+                    //get light bounding box in screen coordinates
+                    const Vec4 lightP1 = MVP * Vec4(-1, -1, 0.0, 1.0);
+                    const Vec4 lightP2 = MVP * Vec4( 1,  1, 0.0, 1.0);
+
+                    const Vec2 screenCoord1 = lightP1 / lightP1.w;
+                    const Vec2 screenCoord2 = lightP2 / lightP2.w;
+
+                    Vec2 screenSpaceScale = Vec2(abs(screenCoord1.x - screenCoord2.x),
+                                                 abs(screenCoord1.y - screenCoord2.y));
+
+                    if(!(screenCoord1.x < 1 &&
+                         screenCoord1.x + screenSpaceScale.x > -1 &&
+                         screenCoord1.y < 1 &&
+                         screenCoord1.y + screenSpaceScale.y > -1)) {
+                           //light out of view, skip it
+                           continue;
+                    }
+
+                    //light is visible, render it
+
                     m_shadowCasterFBO.bind();
 
                     if(light->castShadows) {
@@ -583,9 +611,6 @@ namespace CrabEngine{
                     //draw the light at the light location
 
                     //ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*2.7f);
-                    ScaleMatrix scaleMatrix(Vec2(light->size, light->size)*(30.0f/11));
-                    TranslationMatrix translationMatrix(Vec4(light->location, 0.0, 1.0));
-                    Mat4 MVP = projectionMatrix * viewMatrix * translationMatrix * scaleMatrix;
 
                     //pass transformation matrix to vertex shader
                     m_lightMat.setUniformMat4("MVP", MVP);

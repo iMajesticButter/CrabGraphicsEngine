@@ -164,12 +164,24 @@ int main() {
     cam.clearColor = Vec4(255, 255, 255, 255);
     cam.addPostEffect(&lightingPostEffect);
     cam.addPostEffect(&dither);
+    //cam.setViewportPos(-0.5, 0, 0.5, 1);
+    cam.setViewportPos(0, 0, 0.5, 1);
+    //cam.addPostEffect(&postEffectTest);
+    //cam.addPostEffect(&postEffectTest);
+    //cam.addPostEffect(&postEffectTest);
+    Camera cam3;
+    cam3.clearColor = Vec4(255, 255, 255, 255);
+    cam3.addPostEffect(&lightingPostEffect);
+    cam3.addPostEffect(&dither);
+    cam3.setViewportPos(0.5, 0, 0.5, 1);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     Camera cam2;
-    cam2.clearColor = Vec4(30, 30, 30, 255);
+    cam2.clearColor = Vec4(255, 255, 255, 255);
     cam2.renderLayer = 1;
+    cam2.addPostEffect(&lightingPostEffect);
+    cam2.addPostEffect(&dither);
     cam2.addPostEffect(&postEffectTest);
     cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
 
@@ -233,7 +245,7 @@ int main() {
         renderer.pushLight(&l2);
 
         renderer.pushCamera(&cam);
-        //renderer.pushCamera(&cam2);
+        renderer.pushCamera(&cam3);
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
         renderer.end();

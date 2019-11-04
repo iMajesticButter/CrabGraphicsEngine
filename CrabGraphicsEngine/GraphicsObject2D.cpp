@@ -137,7 +137,7 @@ namespace CrabEngine {
                 m_OLDlocation = location;
             }
 
-            if(!changed)
+            if(changed)
                 return;
 
             transformMatrix = m_transMat * m_rotMat * m_scaleMat;

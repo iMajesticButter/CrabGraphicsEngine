@@ -60,6 +60,21 @@ namespace CrabEngine {
 
         }
 
+        void Mesh::calculateBoundingBox() {
+            using namespace CrabEngine::Math;
+            boundingBox = Vec4(0);
+            for(unsigned i = 0; i < vertecies.size(); ++i) {
+                if(vertecies[i].x < boundingBox.x)
+                    boundingBox.x = vertecies[i].x;
+                if(vertecies[i].y < boundingBox.y)
+                    boundingBox.y = vertecies[i].y;
+                if(vertecies[i].x > boundingBox.z)
+                    boundingBox.z = vertecies[i].x;
+                if(vertecies[i].y > boundingBox.w)
+                    boundingBox.w = vertecies[i].y;
+            }
+        }
+
         VBOlayout Mesh::getLayout() {
             return m_layout;
         }
