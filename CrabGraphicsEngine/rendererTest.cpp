@@ -42,7 +42,24 @@ int main() {
     postEffectMat.AddShader(postFrag);
     postEffectMat.Initialize();
 
+    VertexShader passThruVert("./internalShaders/postEffectPassThru.vs");
+    FragmentShader lightingPostFrag("./internalShaders/EffectLighting.fs");
+
+    Material lightingPostEffectMat(window, "post effect that applies lighting to the whole screen");
+    lightingPostEffectMat.AddShader(passThruVert);
+    lightingPostEffectMat.AddShader(lightingPostFrag);
+    lightingPostEffectMat.Initialize();
+
+    FragmentShader ditherFrag("./internalShaders/EffectDither.fs");
+
+    Material ditherMat(window, "dithering post effect");
+    ditherMat.AddShader(passThruVert);
+    ditherMat.AddShader(ditherFrag);
+    ditherMat.Initialize();
+
     PostEffect postEffectTest(&postEffectMat);
+    PostEffect lightingPostEffect(&lightingPostEffectMat);
+    PostEffect dither(&ditherMat);
 
     Texture mrKrabs(window);
     mrKrabs.loadBitmap("textures/crab.bmp");
@@ -144,7 +161,9 @@ int main() {
 
 
     Camera cam;
-    cam.clearColor = Vec4(100, 100, 100, 0);
+    cam.clearColor = Vec4(255, 255, 255, 255);
+    cam.addPostEffect(&lightingPostEffect);
+    cam.addPostEffect(&dither);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
@@ -156,7 +175,7 @@ int main() {
 
     Light l;
     l.size = 2;
-    l.softness = 8;
+    l.softness = 2;
     l.location = Vec2(1,1);
     l.castShadows = true;
     l.intencity = 1;
@@ -210,14 +229,8 @@ int main() {
             renderer.pushObject(objects[i]);
         }
 
-        /*renderer.pushLight(&l);
+        renderer.pushLight(&l);
         renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
-        renderer.pushLight(&l2);
-        renderer.pushLight(&l2);*/
 
         renderer.pushCamera(&cam);
         //renderer.pushCamera(&cam2);

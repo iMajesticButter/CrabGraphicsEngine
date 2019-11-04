@@ -598,7 +598,7 @@ namespace CrabEngine{
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                 //drawScreenSpaceTexture(&m_shadowMapTex, Vec4(0,0,1,1), 0);
-                drawScreenSpaceTexture(&m_lightsTex, Vec4(0,0,1,1), 0);
+                //drawScreenSpaceTexture(&m_lightsTex, Vec4(0,0,1,1), 0);
 
                 //continue;
 
@@ -673,13 +673,16 @@ namespace CrabEngine{
                     mat->setUniformMat4("MVP", MVP);
                     if(lastMat != mat) {
                         mat->setUniform1f("Time_ms", m_time);
+                        m_lightsTex.bind(0);
+                        mat->setUniform1i("light_texture", 0);
+                        mat->setUniform2f("resolution", Vec2(viewport.z * fbWidth, viewport.w * fbHeight));
                     }
 
                     //set object textures
                     if(lastObj == nullptr || !obj->texturesEqual(*lastObj)) {
                         for(unsigned j = 0; j < obj->getTextureCount(); ++j) {
-                            obj->getTexture(j).tex->bind(j);
-                            mat->setUniform1i(obj->getTexture(j).name, j);
+                            obj->getTexture(j).tex->bind(j+1);
+                            mat->setUniform1i(obj->getTexture(j).name, j+1);
                         }
                     }
 
@@ -766,9 +769,12 @@ namespace CrabEngine{
         void Renderer2D::drawPostEffectQuad(Texture* tex, Material* mat) {
             //glViewport(0, 0, m_window->fbWidth(), m_window->fbHeight());
 
-            tex->bind(0);
+            tex->bind(1);
+            m_ditherPattern.bind(2);
 
-            mat->setUniform1i("frame", 0);
+            mat->setUniform1i("frame", 1);
+            mat->setUniform1i("light_texture", 0);
+            mat->setUniform1i("dither_pattern", 2);
             mat->setUniform1f("Time_ms", m_time);
 
             m_vaoQuad->bind();

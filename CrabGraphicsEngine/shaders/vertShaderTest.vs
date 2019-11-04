@@ -8,6 +8,7 @@ in vec2 in_UV;
 //out vec3 VColor;
 //out float oTest;
 out vec2 uvCoord;
+out vec2 screenCoord;
 uniform mat4 MVP;
 
 void main() {
@@ -17,6 +18,7 @@ void main() {
     uvCoord = in_UV;
 
     vec4 outPos = MVP * in_Position;
+
     //vec4 outPos = inPos;
 
     gl_Position = outPos;
