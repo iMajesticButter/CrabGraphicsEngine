@@ -177,7 +177,7 @@ int main() {
 
     const unsigned fpsSamples = 100;
     unsigned sampleCount = 0;
-    float averageFPS = 0;
+    double averageDT = 0;
 
     while(!window.shouldClose()) {
 
@@ -186,15 +186,13 @@ int main() {
         double dt = time.count();
         last = std::chrono::high_resolution_clock::now();
 
-        double fps = 1/dt;
-
         ++sampleCount;
-        averageFPS += fps;
+        averageDT += dt;
         if(sampleCount >= fpsSamples) {
-            averageFPS /= fpsSamples;
+            double fps = fpsSamples / averageDT;
             sampleCount = 0;
-            //std::cout << "Average FPS: " << averageFPS << std::endl;
-            averageFPS = 0;
+            std::cout << "Average FPS: " << fps << std::endl;
+            averageDT = 0;
         }
 
         cam.location = PlayerPos;

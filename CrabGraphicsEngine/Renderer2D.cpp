@@ -1,6 +1,6 @@
 //#include "GLEW/glew.h"
 
-#define PROFILEING_MODE 2
+#define PROFILEING_MODE 0
 
 #include "CrabRenderer2D.h"
 #include "CrabGraphicsObject2D.h"
