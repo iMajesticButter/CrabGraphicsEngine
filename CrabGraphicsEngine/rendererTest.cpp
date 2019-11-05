@@ -165,7 +165,7 @@ int main() {
     cam.addPostEffect(&lightingPostEffect);
     cam.addPostEffect(&dither);
     //cam.setViewportPos(-0.5, 0, 0.5, 1);
-    //cam.setViewportPos(0, 0, 0.5, 1);
+    cam.setViewportPos(-0.5, 0, 0.5, 1);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
     //cam.addPostEffect(&postEffectTest);
@@ -176,7 +176,7 @@ int main() {
     cam2.addPostEffect(&lightingPostEffect);
     cam2.addPostEffect(&dither);
     //cam2.addPostEffect(&postEffectTest);
-    cam2.setViewportPos(0.75, 0.75, 0.25, 0.25);
+    cam2.setViewportPos(0.5, 0, 0.5, 1);
 
     Light l;
     l.size = 2;
@@ -194,6 +194,7 @@ int main() {
     Renderer2D renderer(&window, Vec3(0,0,0));
 
     bool fullscreen = false;
+    bool borderless = false;
     bool pressed = false;
 
     //fps counter setup
@@ -297,6 +298,13 @@ int main() {
             if(!pressed) {
                 fullscreen = !fullscreen;
                 window.setFullscreen(fullscreen);
+                window.initialize();
+            }
+            pressed = true;
+        } else if(window.keyDown(GLFW_KEY_B)) {
+            if(!pressed) {
+                borderless = !borderless;
+                window.setBorderless(borderless);
                 window.initialize();
             }
             pressed = true;
