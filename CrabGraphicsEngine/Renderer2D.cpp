@@ -451,11 +451,11 @@ namespace CrabEngine{
                 //--------------------------------------------------------
 
                 //generate light texture (a texture that contains all the lit up areas and their colors)
-                m_lightsTex.setWidth(viewport.z * fbWidth);
-                m_lightsTex.setHeight(viewport.w * fbHeight);
+                m_lightsTex.setWidth(fbWidth);
+                m_lightsTex.setHeight(fbHeight);
                 m_lightsTex.Resize();
 
-                m_lightFBO.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+                m_lightFBO.resize(fbWidth, fbHeight);
 
                 m_lightFBO.bind();
 
@@ -596,7 +596,7 @@ namespace CrabEngine{
                     //m_lightFBO.setTexture(&m_lightsTex);
                     m_lightFBO.bind();
 
-                    glViewport(0, 0, viewport.z * fbWidth, viewport.w * fbHeight);
+                    glViewport(0, 0, fbWidth, fbHeight);
 
                     m_lightMat.setUniform3f("lightColor", light->color);
                     m_lightMat.setUniform2f("resolution", res, res);
@@ -642,14 +642,23 @@ namespace CrabEngine{
                 //render all objects to the screen
 
                 //set up frame buffer and textures
-                m_tex0.setWidth(viewport.z * fbWidth);
-                m_tex0.setHeight(viewport.w * fbHeight);
+                //m_tex0.setWidth(viewport.z * fbWidth);
+                //m_tex0.setHeight(viewport.w * fbHeight);
+                //m_tex0.Resize();
+                //m_tex1.setWidth(viewport.z * fbWidth);
+                //m_tex1.setHeight(viewport.w * fbHeight);
+                //m_tex1.Resize();
+                //m_fbo0.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+                //m_fbo1.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+
+                m_tex0.setWidth(fbWidth);
+                m_tex0.setHeight(fbHeight);
                 m_tex0.Resize();
-                m_tex1.setWidth(viewport.z * fbWidth);
-                m_tex1.setHeight(viewport.w * fbHeight);
+                m_tex1.setWidth(fbWidth);
+                m_tex1.setHeight(fbHeight);
                 m_tex1.Resize();
-                m_fbo0.resize(viewport.z * fbWidth, viewport.w * fbHeight);
-                m_fbo1.resize(viewport.z * fbWidth, viewport.w * fbHeight);
+                m_fbo0.resize(fbWidth, fbHeight);
+                m_fbo1.resize(fbWidth, fbHeight);
 
                 Texture* activeTexture = &m_tex0;
 
@@ -661,7 +670,7 @@ namespace CrabEngine{
                 glClear(GL_COLOR_BUFFER_BIT);
 
                 //glViewport(viewport.x * m_window->fbWidth(), viewport.y * m_window->fbHeight(), viewport.z * m_window->fbWidth(), viewport.w * m_window->fbHeight());
-                glViewport(0, 0, viewport.z * fbWidth, viewport.w * fbHeight);
+                glViewport(0, 0, fbWidth, fbHeight);
 
                 indexOffset = 0;
 
@@ -700,7 +709,7 @@ namespace CrabEngine{
                         mat->setUniform1f("Time_ms", m_time);
                         m_lightsTex.bind(0);
                         mat->setUniform1i("light_texture", 0);
-                        mat->setUniform2f("resolution", Vec2(viewport.z * fbWidth, viewport.w * fbHeight));
+                        mat->setUniform2f("resolution", Vec2(fbWidth, fbHeight));
                     }
 
                     //set object textures
@@ -743,9 +752,11 @@ namespace CrabEngine{
                     if(activeTexture == &m_tex0) {
                         activeTexture = &m_tex1;
                         m_fbo1.bind();
+                        glClear(GL_COLOR_BUFFER_BIT);
                     } else {
                         activeTexture = &m_tex0;
                         m_fbo0.bind();
+                        glClear(GL_COLOR_BUFFER_BIT);
                     }
                     //m_fbo.setTexture(activeTexture);
 
