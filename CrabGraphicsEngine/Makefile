@@ -1,7 +1,7 @@
 CXX = g++
 PROJSETTINGS = -std=c++17 -I./lib/include -L./lib/lib -lglew32 -lglfw3 -lopengl32 -lWs2_32 -lole32 -lcomctl32 -lgdi32 -lcomdlg32 -luuid
 MAINFILE = rendererTest
-OBJFILES = BitmapLoader.o Camera.o FrameBuffer.o GraphicsObject2D.o HSVxRGBconversion.o IBO.o Mat4.o Material.o Mesh.o PostEffect.o Renderer2D.o Shader.o Texture.o VAO.o VBO.o Vec2.o Vec3.o Vec4.o Window.o Light.o
+OBJFILES = DebugRenderer.o BitmapLoader.o Camera.o FrameBuffer.o GraphicsObject2D.o HSVxRGBconversion.o IBO.o Mat4.o Material.o Mesh.o PostEffect.o Renderer2D.o Shader.o Texture.o VAO.o VBO.o Vec2.o Vec3.o Vec4.o Window.o Light.o
 
 compile: main.o $(OBJFILES)
 	$(CXX) $(MAINFILE).o $(OBJFILES) -o output $(PROJSETTINGS)
@@ -68,6 +68,9 @@ Vec4.o: Vec4.cpp
 
 Window.o: Window.cpp
 	$(CXX) -c Window.cpp $(PROJSETTINGS)
+
+DebugRenderer.o: DebugRenderer.cpp
+	$(CXX) -c DebugRenderer.cpp $(PROJSETTINGS)
 
 run:
 	output $(ARGS)

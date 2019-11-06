@@ -63,7 +63,7 @@ namespace CrabEngine {
             void setUniform3f  (const std::string_view name, const CrabEngine::Math::Vec3& vec);
             void setUniform4f  (const std::string_view name, const CrabEngine::Math::Vec4& vec);
 
-            void setUniformMat4(const std::string_view name, CrabEngine::Math::Mat4& mat);
+            void setUniformMat4(const std::string_view name, const CrabEngine::Math::Mat4& mat);
 
             friend void windowReset(void* context);
 

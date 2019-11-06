@@ -9,6 +9,7 @@
 #include "CrabFrameBuffer.h"
 #include "CrabTexture.h"
 #include "CrabLight.h"
+#include "CrabDebugRenderer.h"
 
 #include <vector>
 #include <chrono>
@@ -44,6 +45,7 @@ namespace CrabEngine {
             void pushCamera(Camera* cam);
             void pushObject(GraphicsObject2D* obj);
             void pushLight(Light* light);
+            void pushDebugLine(const CrabEngine::Math::Vec3& start, const CrabEngine::Math::Vec3& end, const CrabEngine::Math::Vec3& color);
             void end(Texture* outputTexture = nullptr);
 
         private:
@@ -51,6 +53,8 @@ namespace CrabEngine {
             void drawPostEffectQuad(Texture* tex, Material* mat);
 
             Window* m_window;
+
+            DebugRenderer m_debugRenderer;
 
             std::vector<GraphicsObject2D*> m_objects;
             std::vector<Light*> m_lights;

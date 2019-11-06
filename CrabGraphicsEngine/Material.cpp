@@ -336,7 +336,7 @@ namespace CrabEngine {
                 glUseProgram(0);
         }
 
-        void Material::setUniformMat4(const std::string_view name, CrabEngine::Math::Mat4& mat) {
+        void Material::setUniformMat4(const std::string_view name, const CrabEngine::Math::Mat4& mat) {
             if(!m_bound)
                 glUseProgram(m_program);
             GLint uniformPointer = GetUniformLocation(name);

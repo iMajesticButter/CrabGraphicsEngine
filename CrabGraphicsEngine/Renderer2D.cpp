@@ -38,7 +38,7 @@ namespace CrabEngine{
         // Renderer 2D
         //-------------------------------------------------------
 
-        Renderer2D::Renderer2D(Window* window, CrabEngine::Math::Vec3 _ambientLight) : ambientLight(_ambientLight), m_window(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
+        Renderer2D::Renderer2D(Window* window, CrabEngine::Math::Vec3 _ambientLight) : ambientLight(_ambientLight), m_window(window), m_debugRenderer(window), m_screenSpaceImageMat(*window, "Screen Space Image"),
                 m_screenSpaceImageFrag("./internalShaders/screenSpaceImage.fs"),
                 m_screenSpaceImageVert("./internalShaders/screenSpaceImage.vs"),
                 m_tex0(*window, false),
@@ -318,6 +318,10 @@ namespace CrabEngine{
                     m_numIndeciesShadowCasters += obj->getMesh()->triangles.size();
                 }
             }
+        }
+
+        void Renderer2D::pushDebugLine(const CrabEngine::Math::Vec3& start, const CrabEngine::Math::Vec3& end, const CrabEngine::Math::Vec3& color) {
+            m_debugRenderer.AddLine(start, end, color);
         }
 
 
@@ -743,6 +747,11 @@ namespace CrabEngine{
                     std::cout << t.count() << std::endl;
                 #endif
 
+                //draw debug renderer output
+                m_debugRenderer.Draw(projectionMatrix, viewMatrix);
+
+
+
                 //do post processing effects
 
                 std::vector<PostEffect*> postEffects = cam->getPostEffects();
@@ -798,6 +807,8 @@ namespace CrabEngine{
             m_objects.clear();
             m_lights.clear();
             m_cams.clear();
+
+            m_debugRenderer.Clear();
 
             if(!outTex) {
                 m_window->update();

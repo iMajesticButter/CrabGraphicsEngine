@@ -16,13 +16,13 @@ namespace CrabEngine {
             Mat4(const Mat4& other);
 
             //getters
-            float* begin();
+            const float* begin() const;
             float getVal(unsigned x, unsigned y) const;
             //setters
             void setVal(float val, unsigned x, unsigned y);
 
             //operators
-            Mat4 operator*(const Mat4& other);
+            Mat4 operator*(const Mat4& other) const;
             Mat4& operator*=(const Mat4& other);
             Mat4& operator=(const Mat4& other);
 

@@ -131,8 +131,8 @@ int main() {
     objects.push_back(&player);
 
     //performance test
-    const int w = 100;
-    const int h = 100;
+    const int w = 10;
+    const int h = 10;
 
     for(unsigned x = 0; x < w; ++x) {
         for(unsigned y = 0; y < h; ++y) {
@@ -162,8 +162,8 @@ int main() {
 
     Camera cam;
     cam.clearColor = Vec4(255, 255, 255, 255);
-    cam.addPostEffect(&lightingPostEffect);
-    cam.addPostEffect(&dither);
+    //cam.addPostEffect(&lightingPostEffect);
+    //cam.addPostEffect(&dither);
     //cam.setViewportPos(-0.5, 0, 0.5, 1);
     cam.setViewportPos(-0.5, 0, 0.5, 1);
     //cam.addPostEffect(&postEffectTest);
@@ -173,8 +173,8 @@ int main() {
     Camera cam2;
     cam2.clearColor = Vec4(255, 255, 255, 255);
     cam2.renderLayer = 1;
-    cam2.addPostEffect(&lightingPostEffect);
-    cam2.addPostEffect(&dither);
+    //cam2.addPostEffect(&lightingPostEffect);
+    //cam2.addPostEffect(&dither);
     //cam2.addPostEffect(&postEffectTest);
     cam2.setViewportPos(0.5, 0, 0.5, 1);
 
@@ -240,6 +240,8 @@ int main() {
 
         renderer.pushCamera(&cam);
         renderer.pushCamera(&cam2);
+
+        renderer.pushDebugLine(Vec3(0,0,0), Vec3(1,2,3), Vec3(1,0,0));
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
         renderer.end();

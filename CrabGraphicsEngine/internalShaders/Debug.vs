@@ -4,16 +4,10 @@
 //     THIS SHADER IS USED BY THE RENDERER INTERNALLY, DO NOT MOVE OR MODIFY!!!!!!!!!!!!!!!!!!
 //--------------------------------------------------------------------------------------------------------
 
-in vec2 UV;
+in vec4 in_Position;
 
-out vec4 fragColor;
-
-uniform sampler2D frame;
-uniform sampler2D dither_pattern;
+uniform mat4 MVP;
 
 void main() {
-
-    fragColor = texture(frame, UV);
-    fragColor += vec4(texture(dither_pattern, gl_FragCoord.xy / 8.0).r / 16.0 - (1.0 / 128.0));
-
+    gl_Position = in_Position;
 }

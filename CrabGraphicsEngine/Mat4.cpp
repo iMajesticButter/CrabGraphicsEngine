@@ -46,7 +46,7 @@ namespace CrabEngine {
         }
 
         //getters
-        float* Mat4::begin() {
+        const float* Mat4::begin() const {
             return m_mat;
         }
         float Mat4::getVal(unsigned x, unsigned y) const {
@@ -58,7 +58,7 @@ namespace CrabEngine {
         }
 
         //operators
-        Mat4 Mat4::operator*(const Mat4& other) {
+        Mat4 Mat4::operator*(const Mat4& other) const {
             Mat4 mat(false);
             /*for(unsigned i = 0; i < 4; ++i) {
                 for(unsigned j = 0; j < 4; ++j) {
