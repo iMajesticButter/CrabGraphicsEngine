@@ -61,6 +61,8 @@ namespace CrabEngine {
 
             GLfloat data[6];
 
+            glLineWidth(3);
+
             for(unsigned i = 0; i < m_lines.size(); ++i) {
 
                 data[0] = std::get<0>(m_lines[i]).x;
@@ -74,9 +76,11 @@ namespace CrabEngine {
                 m_vbo->setData(sizeof(GLfloat) * 6, data);
                 m_debugMat.setUniform3f("Color", std::get<2>(m_lines[i]));
 
-                glDrawBuffer(GL_LINES);
+                glDrawArrays(GL_LINES, 0, 2);
 
             }
+
+            glLineWidth(1);
 
             m_debugMat.unbind();
             m_vao->unbind();

@@ -9,7 +9,6 @@ out vec4 fragColor;
 uniform vec3 Color;
 
 void main() {
-    //fragColor.rgb = Color;
-    //fragColor.a = 1.0;
-    fragColor = vec4(1,1,1,1);
+    fragColor.rgb = Color;
+    fragColor.a = 1.0;
 }

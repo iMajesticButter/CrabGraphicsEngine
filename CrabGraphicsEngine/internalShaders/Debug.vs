@@ -9,5 +9,5 @@ in vec4 in_Position;
 uniform mat4 MVP;
 
 void main() {
-    gl_Position = in_Position;
+    gl_Position = MVP * in_Position;
 }
