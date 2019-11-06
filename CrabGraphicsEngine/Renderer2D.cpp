@@ -480,18 +480,24 @@ namespace CrabEngine{
 
                     //get light bounding box in screen coordinates
                     const Vec4 lightP1 = MVP * Vec4(-1, -1, 0.0, 1.0);
-                    const Vec4 lightP2 = MVP * Vec4( 1,  1, 0.0, 1.0);
+                    const Vec4 lightP2 = MVP * Vec4(-1,  1, 0.0, 1.0);
+                    const Vec4 lightP3 = MVP * Vec4( 1,  1, 0.0, 1.0);
+                    const Vec4 lightP4 = MVP * Vec4( 1, -1, 0.0, 1.0);
 
                     const Vec2 screenCoord1 = lightP1 / lightP1.w;
                     const Vec2 screenCoord2 = lightP2 / lightP2.w;
+                    const Vec2 screenCoord3 = lightP3 / lightP3.w;
+                    const Vec2 screenCoord4 = lightP4 / lightP4.w;
 
-                    Vec2 screenSpaceScale = Vec2(abs(screenCoord1.x - screenCoord2.x),
-                                                 abs(screenCoord1.y - screenCoord2.y));
+                    const float minx = std::min(std::min(screenCoord3.x, screenCoord4.x), std::min(screenCoord1.x, screenCoord2.x));
+                    const float maxx = std::max(std::max(screenCoord3.x, screenCoord4.x), std::max(screenCoord1.x, screenCoord2.x));
+                    const float miny = std::min(std::min(screenCoord3.y, screenCoord4.y), std::min(screenCoord1.y, screenCoord2.y));
+                    const float maxy = std::max(std::max(screenCoord3.y, screenCoord4.y), std::max(screenCoord1.y, screenCoord2.y));
 
-                    if(!(screenCoord1.x < 1 &&
-                         screenCoord1.x + screenSpaceScale.x > -1 &&
-                         screenCoord1.y < 1 &&
-                         screenCoord1.y + screenSpaceScale.y > -1)) {
+                    if(!(minx < 1 &&
+                         maxx > -1 &&
+                         miny < 1 &&
+                         maxy > -1)) {
                            //light out of view, skip it
                            continue;
                     }
