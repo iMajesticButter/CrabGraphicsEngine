@@ -235,7 +235,7 @@ int main() {
         for(unsigned i = 0; i < objects.size(); ++i) {
             renderer.pushObject(objects[i]);
         }
-
+        
         renderer.pushLight(&l);
         renderer.pushLight(&l2);
 
