@@ -46,6 +46,7 @@ namespace CrabEngine {
             void pushObject(GraphicsObject2D* obj);
             void pushLight(Light* light);
             void pushDebugLine(const CrabEngine::Math::Vec3& start, const CrabEngine::Math::Vec3& end, const CrabEngine::Math::Vec3& color);
+            void pushDebugCircle(const CrabEngine::Math::Vec3& center, float radius, const CrabEngine::Math::Vec3& color);
             void end(Texture* outputTexture = nullptr);
 
         private:

@@ -324,6 +324,10 @@ namespace CrabEngine{
             m_debugRenderer.AddLine(start, end, color);
         }
 
+        void Renderer2D::pushDebugCircle(const CrabEngine::Math::Vec3& center, float radius, const CrabEngine::Math::Vec3& color) {
+            m_debugRenderer.AddCircle(center, radius, color);
+        }
+
 
         void Renderer2D::end(Texture* outputTexture) {
             if(!m_active) {

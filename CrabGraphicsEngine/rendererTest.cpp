@@ -192,6 +192,7 @@ int main() {
     l2.location = Vec2(2,3);
 
     Renderer2D renderer(&window, Vec3(0,0,0));
+    renderer.ambientLight = Vec3(0.25,0.15,0.15);
 
     bool fullscreen = false;
     bool borderless = false;
@@ -241,7 +242,8 @@ int main() {
         renderer.pushCamera(&cam);
         renderer.pushCamera(&cam2);
 
-        renderer.pushDebugLine(Vec3(0,0,0), Vec3(1,2,3), Vec3(1,0,0));
+        renderer.pushDebugLine(Vec3(-4,3,0), Vec3(1,1.5,0), Vec3(1,0,0));
+        renderer.pushDebugCircle(Vec3(1,3,0), 1, Vec3(0,1,0));
 
         //renderer.drawScreenSpaceTexture(&sponge, Vec4(0, 0, 1, 1));
         renderer.end();

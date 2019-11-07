@@ -58,6 +58,6 @@ void main() {
 	att *= att;
 
     //fragColor = vec4(lightColor, intencity) * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
-	fragColor = (vec4(lightColor, 1.0) * vec4(sum * att)) * intencity;
+	fragColor = (vec4(lightColor, 1.0) * vec4(sum * att)) * intencity * step(0.001, texture(frame, tc));
 	//fragColor += vec4(texture(ditherPattern, gl_FragCoord.xy / 8.0).r / 16.0 - (1.0 / 128.0));
 }

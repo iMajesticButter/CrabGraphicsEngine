@@ -22,6 +22,7 @@ namespace CrabEngine {
             ~DebugRenderer();
 
             void AddLine(const CrabEngine::Math::Vec3& start, const CrabEngine::Math::Vec3& end, const CrabEngine::Math::Vec3& color);
+            void AddCircle(const CrabEngine::Math::Vec3& center, float radius, const CrabEngine::Math::Vec3& color);
             void Draw(const CrabEngine::Math::Mat4& projection, const CrabEngine::Math::Mat4& view);
             void Clear();
 
@@ -31,9 +32,13 @@ namespace CrabEngine {
             void Init();
 
             std::vector<std::tuple<CrabEngine::Math::Vec3, CrabEngine::Math::Vec3, CrabEngine::Math::Vec3>> m_lines;
+            std::vector<std::tuple<CrabEngine::Math::Vec3, float, CrabEngine::Math::Vec3>> m_circles;
 
             VBO* m_vbo;
             VAO* m_vao;
+
+            VBO* m_vboCircle;
+            VAO* m_vaoCircle;
 
             Material m_debugMat;
 
